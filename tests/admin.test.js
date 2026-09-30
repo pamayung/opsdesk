@@ -33,7 +33,7 @@ eq('rename lokasi merambat ke lokasi pengguna', [beforeCitra, c.users.find((u) =
 A.updateLocation('head-office', { name: 'Head Office', parentId: null, kind: 'head_office' });
 throws('hapus lokasi: masih punya turunan', () => A.removeLocation('operations'), /lokasi di bawahnya/);
 throws('hapus lokasi: dipakai tiket', () => A.removeLocation('senopati'), /dipakai \d+ tiket/);
-throws('hapus lokasi: dipakai cakupan area tim', () => A.removeLocation('area-1'), /kok|di bawahnya|cakupan/);
+throws('hapus lokasi: dipakai cakupan area tim', () => A.removeLocation('area-1'), /di bawahnya|area scope/);
 A.removeLocation(c.listLocations.execute().find((l) => l.name === 'Outlet Tebet').id);
 A.removeLocation(a3.id);
 eq('lokasi yang tak dipakai bisa dihapus', c.listLocations.execute().some((l) => l.name === 'Area 3'), false);
@@ -53,7 +53,7 @@ eq('pertanyaan tersimpan (opsi duplikat dibuang, id dibuat)', c.catalog.subsOf(k
 throws('pilihan minimal 2', () => A.saveQuestions(kend.id, sv.id, [{ label: 'X', type: 'select', options: ['a'] }]), /minimal 2 pilihan/);
 throws('label pertanyaan wajib', () => A.saveQuestions(kend.id, sv.id, [{ label: ' ', type: 'text' }]), /label wajib/);
 throws('jenis pertanyaan valid', () => A.saveQuestions(kend.id, sv.id, [{ label: 'X', type: 'aneh' }]), /tidak dikenal/);
-throws('hapus subkategori: dipakai aturan', () => A.removeSub('it', 'pos'), /dipakai aturan routing/);
+throws('hapus subkategori: dipakai aturan', () => A.removeSub('it', 'pos'), /dipakai routing rules/);
 
 // ===== Department & tim
 const deptId = A.addDepartment({ name: 'Logistik', head: 'Bima Sakti' });
@@ -63,18 +63,18 @@ eq('tim baru tersimpan', [c.teams[tid].name, c.teams[tid].members.length, c.team
 throws('jam kerja: mulai < selesai', () => A.updateTeam(tid, { name: 'Armada', department: deptId, lead: 'B', hours: { days: [1], from: '17:00', to: '08:00' } }), /lebih awal/);
 throws('jam kerja: minimal satu hari', () => A.updateTeam(tid, { name: 'Armada', department: deptId, lead: 'B', hours: { days: [], from: '08:00', to: '17:00' } }), /minimal satu hari/);
 throws('on-call bukan diri sendiri', () => A.updateTeam(tid, { name: 'Armada', department: deptId, lead: 'B', onCall: tid }), /sendiri/);
-throws('ketua tim wajib', () => A.updateTeam(tid, { name: 'Armada', department: deptId, lead: '' }), /ketua tim/);
+throws('ketua tim wajib', () => A.updateTeam(tid, { name: 'Armada', department: deptId, lead: '' }), /team lead/);
 throws('nama tim unik', () => A.addTeam({ name: 'IT Helpdesk', department: 'it', lead: 'X' }), /sudah ada/);
 A.addMember(tid, { name: 'Sopir Andi', scope: ['dc-cikarang'] });
-throws('anggota unik dalam tim', () => A.addMember(tid, { name: 'sopir andi' }), /sudah menjadi anggota/);
+throws('anggota unik dalam tim', () => A.addMember(tid, { name: 'sopir andi' }), /sudah menjadi member/);
 throws('cakupan area harus lokasi yang ada', () => A.addMember(tid, { name: 'Sopir Budi', scope: ['nowhere'] }), /tidak ada/);
 A.updateTeam(tid, { name: 'Armada Logistik', department: deptId, lead: 'Bima Sakti', hours: null });
 eq('update tim mempertahankan anggota & jam 24 jam', [c.teams[tid].name, c.teams[tid].members.length, c.teams[tid].hours], ['Armada Logistik', 1, null]);
 A.updateMember(tid, 'sopir-andi', { available: false, scope: [] });
 eq('anggota: ketersediaan & cakupan diubah', [c.teams[tid].members[0].available, c.teams[tid].members[0].scope], [false, undefined]);
-throws('hapus department: masih punya tim', () => A.removeDepartment(deptId), /masih punya 1 tim/);
-throws('hapus tim: dipakai aturan', () => A.removeTeam('it_area'), /dipakai \d+ aturan/);
-throws('hapus tim: jadi on-call tim lain', () => A.removeTeam('it_oncall'), /on-call untuk/);
+throws('hapus department: masih punya tim', () => A.removeDepartment(deptId), /masih punya 1 team/);
+throws('hapus tim: dipakai aturan', () => A.removeTeam('it_area'), /dipakai \d+ routing rules/);
+throws('hapus tim: jadi on-call tim lain', () => A.removeTeam('it_oncall'), /on-call team untuk/);
 throws('hapus tim: dipakai PIC', () => A.removeTeam('ga_engineering') || A.removeTeam('it_helpdesk'), /dipakai|on-call|PIC/);
 
 // ===== Aturan routing (dan efeknya langsung ke hasil routing)
@@ -91,7 +91,7 @@ eq('aturan bawaan tetap paling bawah setelah banyak pergeseran', c.rules[c.rules
 throws('aturan wajib punya kondisi', () => A.addRule({ team: 'it_area' }), /minimal satu kondisi/);
 throws('subkategori butuh kategori', () => A.addRule({ sub: 'pos', team: 'it_area' }), /kategori sebelum subkategori/);
 throws('subkategori harus milik kategori', () => A.addRule({ category: 'hr', sub: 'pos', team: 'it_area' }), /tidak ada di kategori/);
-throws('tim tujuan harus ada', () => A.addRule({ category: 'it', team: 'nope' }), /tim tujuan/);
+throws('tim tujuan harus ada', () => A.addRule({ category: 'it', team: 'nope' }), /team tujuan/);
 throws('aturan bawaan tidak bisa dihapus', () => A.removeRule('default'), /tidak bisa dihapus/);
 A.updateRule('default', { team: 'hr_service' });
 eq('aturan bawaan hanya ganti tim tujuan', [c.rules.at(-1).id, c.rules.at(-1).team, Object.keys(c.rules.at(-1)).length], ['default', 'hr_service', 2]);
@@ -110,9 +110,9 @@ eq('jam kerja diubah admin: 10:00 WIB sekarang di luar jam -> on-call', route('i
 A.updateTeam('it_helpdesk', { name: 'IT Helpdesk', department: 'it', lead: 'Niko Pratama', onCall: 'it_oncall', hours: { days: [1, 2, 3, 4, 5], from: '08:00', to: '17:00' } });
 
 // ===== Pengguna
-throws('PIC wajib punya tim', () => A.addUser({ name: 'Tim Kosong', role: 'pic' }), /minimal satu tim/);
+throws('PIC wajib punya tim', () => A.addUser({ name: 'Tim Kosong', role: 'pic' }), /minimal satu team/);
 throws('manajer wajib department', () => A.addUser({ name: 'Mgr Kosong', role: 'manager' }), /memilih department/);
-throws('peran valid', () => A.addUser({ name: 'Aneh', role: 'dewa' }), /Pilih peran/);
+throws('peran valid', () => A.addUser({ name: 'Aneh', role: 'dewa' }), /Pilih role/);
 throws('nama pengguna unik', () => A.addUser({ name: 'kevin mahendra', role: 'employee' }), /sudah ada/);
 const uid = A.addUser({ name: 'Rara Baru', role: 'pic', title: 'IT Helpdesk', teamIds: ['it_helpdesk'] });
 const rara = c.users.find((u) => u.id === uid);
@@ -125,7 +125,7 @@ throws('harus ada minimal satu admin (hapus)', () => A.removeUser('sari', 'kevin
 throws('harus ada minimal satu admin (ubah peran)', () => A.updateUser('sari', { role: 'employee' }), /minimal satu administrator/);
 A.removeUser(uid, 'sari');
 eq('pengguna dihapus', c.users.some((u) => u.id === uid), false);
-throws('hapus tim: dipakai pengguna PIC (Kevin)', () => { A.addTeam({ name: 'Tim Uji', department: 'it', lead: 'X' }); const t = Object.keys(c.teams).find((k) => c.teams[k].name === 'Tim Uji'); A.addUser({ name: 'Pic Uji', role: 'pic', teamIds: [t] }); A.removeTeam(t); }, /dipakai pengguna/);
+throws('hapus tim: dipakai pengguna PIC (Kevin)', () => { A.addTeam({ name: 'Tim Uji', department: 'it', lead: 'X' }); const t = Object.keys(c.teams).find((k) => c.teams[k].name === 'Tim Uji'); A.addUser({ name: 'Pic Uji', role: 'pic', teamIds: [t] }); A.removeTeam(t); }, /dipakai user/);
 
 // ===== Shadow detection unit
 eq('covers: aturan umum menutupi yang lebih spesifik', covers({ category: 'it' }, { category: 'it', sub: 'pos' }), true);

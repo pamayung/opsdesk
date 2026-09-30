@@ -14,11 +14,11 @@ const need = (repo, id, user) => {
   return t;
 };
 const editable = (t) => {
-  if (t.status === 'done') throw new Error('Tiket sudah selesai dan tidak bisa diubah.');
+  if (t.status === 'done') throw new Error('Tiket sudah resolved dan tidak bisa diubah.');
   return t;
 };
 const handler = (t, user) => {
-  if (!canHandle(user, t)) throw new Error('Hanya PIC atau manajer department yang bisa menangani tiket ini.');
+  if (!canHandle(user, t)) throw new Error('Hanya PIC atau department manager yang bisa menangani tiket ini.');
   return t;
 };
 
@@ -60,7 +60,7 @@ export class ListAreas {
     return [...new Set(this.repo.list().filter((t) => !n || normalize(t.branch) === n).map((t) => t.location).filter(Boolean))];
   }
 }
-// Pratinjau routing untuk form: memakai mesin yang sama dengan saat tiket dibuat.
+// Preview routing untuk form: memakai mesin yang sama dengan saat tiket dibuat.
 export class PreviewRoute {
   constructor(router) { this.router = router; }
   execute({ categoryId, subId, type, kind, priority, locationIds }, now = Date.now()) {
@@ -79,10 +79,10 @@ export class CreateTicket {
     const area = cleanName(input.area);
     const title = cleanName(input.title);
     const type = input.type || 'incident';
-    if (!REQUEST_TYPES[type]) throw new Error('Jenis kebutuhan tidak dikenal.');
-    if (!input.priority) throw new Error('Pilih tingkat kedaruratan.');
+    if (!REQUEST_TYPES[type]) throw new Error('Request type tidak dikenal.');
+    if (!input.priority) throw new Error('Pilih priority.');
     if (!locName) throw new Error('Isi atau pilih lokasi.');
-    if (!catName) throw new Error('Isi atau pilih kategori masalah.');
+    if (!catName) throw new Error('Isi atau pilih kategori.');
     if (title.length < 5) throw new Error('Judul minimal 5 karakter.');
 
     // Lokasi baru harus ditempatkan di bawah induk yang sudah ada, agar jenis & cakupan areanya jelas.
@@ -129,7 +129,7 @@ export class AssignPic {
     const who = cleanName(name);
     if (!who) throw new Error('Pilih PIC terlebih dahulu.');
     if (t.assignee === who) return t;
-    const text = who === actor.name ? `Tiket diambil oleh ${who}` : `${who} ditugaskan sebagai PIC oleh ${actor.name}`;
+    const text = who === actor.name ? `Ticket taken by ${who}` : `${who} assigned as PIC by ${actor.name}`;
     return this.repo.save(t.with({
       status: 'in_progress', assignee: who, respondedAt: t.respondedAt || now, notes: [...t.notes, systemNote(text, now)],
     }));
@@ -144,7 +144,7 @@ export class AddNote {
   execute(id, { actor, text = '', image = null }, now = Date.now()) {
     const t = editable(need(this.repo, id, actor));
     const body = text.trim();
-    if (!body && !image) throw new Error('Tulis catatan atau lampirkan foto.');
+    if (!body && !image) throw new Error('Tulis catatan atau attach foto.');
     if (body.length > 500) throw new Error('Catatan maksimal 500 karakter.');
     const note = makeNote({ party: PARTY_OF_ROLE[actor.role] || 'supervisor', author: actor.name, role: actor.title || '', text: body, image, at: now });
     return this.repo.save(t.with({ notes: [...t.notes, note] }));
@@ -155,15 +155,15 @@ export class CloseTicket {
   // Menutup tiket dengan catatan penyelesaian (apa yang sudah dilakukan).
   execute(id, { actor, note }, now = Date.now()) {
     const t = handler(editable(need(this.repo, id, actor)), actor);
-    if (t.status !== 'in_progress') throw new Error('Tetapkan PIC terlebih dahulu sebelum menyelesaikan tiket.');
+    if (t.status !== 'in_progress') throw new Error('Assign PIC terlebih dahulu sebelum resolve tiket.');
     const text = (note || '').trim();
     if (text.length < 5) throw new Error('Tulis apa yang sudah dilakukan (minimal 5 karakter).');
-    if (text.length > 500) throw new Error('Catatan penyelesaian maksimal 500 karakter.');
+    if (text.length > 500) throw new Error('Resolution note maksimal 500 karakter.');
     return this.repo.save(t.with({
       status: 'done', resolution: { note: text, closedBy: actor.name, closedAt: now },
       notes: [...t.notes,
-        makeNote({ party: PARTY_OF_ROLE[actor.role] || 'supervisor', author: actor.name, role: actor.title || '', text: `Penyelesaian: ${text}`, at: now }),
-        systemNote(`Tiket diselesaikan oleh ${actor.name}`, now)],
+        makeNote({ party: PARTY_OF_ROLE[actor.role] || 'supervisor', author: actor.name, role: actor.title || '', text: `Resolution: ${text}`, at: now }),
+        systemNote(`Ticket resolved by ${actor.name}`, now)],
     }));
   }
 }
@@ -172,12 +172,12 @@ export class EscalateTicket {
   // Eskalasi manual ke pihak luar (vendor / kontraktor). Dicatat di timeline.
   execute(id, actor, { to }, now = Date.now()) {
     const t = handler(editable(need(this.repo, id, actor)), actor);
-    if (t.escalation) throw new Error('Tiket ini sudah dieskalasi.');
+    if (t.escalation) throw new Error('Tiket ini sudah di-escalate.');
     const target = cleanName(to);
     if (target.length < 2) throw new Error('Isi nama vendor atau pihak yang dituju.');
     return this.repo.save(t.with({
       escalation: { to: target, at: now, by: actor.name },
-      notes: [...t.notes, systemNote(`Dieskalasi ke ${target} oleh ${actor.name}`, now)],
+      notes: [...t.notes, systemNote(`Escalated to ${target} by ${actor.name}`, now)],
     }));
   }
 }

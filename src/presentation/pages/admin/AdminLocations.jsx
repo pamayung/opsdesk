@@ -29,10 +29,10 @@ export default class AdminLocations extends AdminTab {
     const parents = form ? nodes.filter((n) => !form.id || !chainOf(nodes, n.id).some((x) => x.id === form.id)) : [];
     const rows = walk(nodes);
     return (
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <section className="rounded-2xl border border-slate-200 bg-white" aria-labelledby="loc-title">
           <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
-            <div><h2 id="loc-title" className="font-semibold text-slate-950">Struktur lokasi</h2><p className="text-xs text-slate-500">{nodes.length} lokasi. Jenis (outlet, head office, warehouse) diwarisi turunannya dan dipakai aturan routing.</p></div>
+            <div><h2 id="loc-title" className="font-semibold text-slate-950">Struktur lokasi</h2><p className="text-xs text-slate-500">{nodes.length} lokasi. Jenis (outlet, head office, warehouse) diwarisi turunannya dan dipakai routing rules.</p></div>
             <button type="button" onClick={() => this.add('')} className={`${btnSmall} bg-[var(--brand)] text-white hover:brightness-110`}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Lokasi utama</button>
           </div>
           <ul className="divide-y divide-slate-100">
@@ -65,7 +65,7 @@ export default class AdminLocations extends AdminTab {
                 </select>
               </Field>
               {!form.parentId && (
-                <Field label="Jenis lokasi" htmlFor="loc-kind" hint="Diwarisi seluruh turunan dan dipakai aturan routing.">
+                <Field label="Jenis lokasi" htmlFor="loc-kind" hint="Diwarisi seluruh turunan dan dipakai routing rules.">
                   <select id="loc-kind" className={`${inputCls} mt-1`} value={form.kind} onChange={this.set('kind')}>
                     {Object.entries(LOCATION_KINDS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                   </select>

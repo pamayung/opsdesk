@@ -45,7 +45,7 @@ export default class FieldNotes extends React.Component {
             <time className="shrink-0 text-xs tabular-nums text-slate-500">{time}</time>
           </div>
           {n.text && <p className="mt-1.5 whitespace-pre-line break-words text-sm leading-6 text-slate-700">{n.text}</p>}
-          {n.image && <img src={n.image} alt={`Foto lampiran dari ${n.author}`} loading="lazy" className="mt-3 max-h-64 w-full max-w-sm rounded-lg object-cover" />}
+          {n.image && <img src={n.image} alt={`Attachment dari ${n.author}`} loading="lazy" className="mt-3 max-h-64 w-full max-w-sm rounded-lg object-cover" />}
         </div>
       </li>
     );
@@ -67,12 +67,12 @@ export default class FieldNotes extends React.Component {
         </ol>
 
         {t.status === 'done' ? (
-          <p className="mt-5 rounded-xl bg-slate-50 p-3 text-center text-sm text-slate-500">Tiket sudah selesai. Catatan tidak bisa ditambah lagi.</p>
+          <p className="mt-5 rounded-xl bg-slate-50 p-3 text-center text-sm text-slate-500">Tiket sudah resolved. Catatan tidak bisa ditambah lagi.</p>
         ) : (
           <form onSubmit={this.send} className="mt-5 border-t border-slate-100 pt-4">
             {image && (
               <div className="mb-3 inline-flex items-center gap-2 rounded-xl bg-slate-50 p-2 pr-3">
-                <img src={image} alt="Pratinjau foto yang akan dikirim" className="h-12 w-12 rounded-lg object-cover" />
+                <img src={image} alt="Preview foto yang akan dikirim" className="h-12 w-12 rounded-lg object-cover" />
                 <span className="text-xs text-slate-600">Foto siap dikirim</span>
                 <button type="button" onClick={() => this.setState({ image: null })} aria-label="Hapus foto" className="grid h-7 w-7 place-items-center rounded-full text-slate-500 hover:bg-slate-200"><X className="h-4 w-4" aria-hidden="true" /></button>
               </div>
@@ -80,7 +80,7 @@ export default class FieldNotes extends React.Component {
             <div className="flex items-center gap-2">
               <label htmlFor="note-input" className="sr-only">Instruksi atau update cepat</label>
               <input id="note-input" value={text} maxLength={500} onChange={(e) => this.setState({ text: e.target.value, error: '' })} placeholder="Tulis instruksi atau update cepat…" className="min-h-[44px] min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]" />
-              <button type="button" onClick={() => this.fileRef.current.click()} disabled={busy} aria-label="Lampirkan foto" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"><Paperclip className="h-[18px] w-[18px]" aria-hidden="true" /></button>
+              <button type="button" onClick={() => this.fileRef.current.click()} disabled={busy} aria-label="Attach foto" className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 disabled:opacity-50"><Paperclip className="h-[18px] w-[18px]" aria-hidden="true" /></button>
               <input ref={this.fileRef} type="file" accept="image/*" className="sr-only" tabIndex={-1} onChange={this.onFile} />
               <button type="submit" disabled={busy || (!text.trim() && !image)} className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-[var(--brand)] px-4 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">Kirim<Send className="h-4 w-4" aria-hidden="true" /></button>
             </div>

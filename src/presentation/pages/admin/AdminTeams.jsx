@@ -3,8 +3,8 @@ import { Plus, Users, X } from 'lucide-react';
 import { pathText } from '../../../domain/Location';
 import { AdminTab, Field, ConfirmButton, ErrorNote, inputCls, btnPrimary, btnSecondary, btnSmall } from '../../components/admin/kit';
 
-const DAYS = [[1, 'Sen'], [2, 'Sel'], [3, 'Rab'], [4, 'Kam'], [5, 'Jum'], [6, 'Sab'], [7, 'Min']];
-const hoursText = (h) => (h ? `${h.days.length === 7 ? 'Setiap hari' : h.days.map((d) => DAYS[d - 1][1]).join(', ')} ${h.from}–${h.to}` : '24 jam');
+const DAYS = [[1, 'Mon'], [2, 'Tue'], [3, 'Wed'], [4, 'Thu'], [5, 'Fri'], [6, 'Sat'], [7, 'Sun']];
+const hoursText = (h) => (h ? `${h.days.length === 7 ? 'Every day' : h.days.map((d) => DAYS[d - 1][1]).join(', ')} ${h.from}–${h.to}` : '24 hours');
 
 // ---------- Editor department ----------
 class DepartmentEditor extends AdminTab {
@@ -26,7 +26,7 @@ class DepartmentEditor extends AdminTab {
       <form onSubmit={this.save} className="space-y-4">
         <h2 className="font-semibold text-slate-950">{deptId ? 'Ubah department' : 'Department baru'}</h2>
         <Field label="Nama department" htmlFor="dept-name"><input id="dept-name" className={`${inputCls} mt-1`} value={this.state.name} onChange={(e) => this.setState({ name: e.target.value, error: '' })} /></Field>
-        <Field label="Kepala department" htmlFor="dept-head" hint="Menerima eskalasi SLA level 2."><input id="dept-head" className={`${inputCls} mt-1`} value={this.state.head} onChange={(e) => this.setState({ head: e.target.value, error: '' })} /></Field>
+        <Field label="Department head" htmlFor="dept-head" hint="Menerima escalation SLA level 2."><input id="dept-head" className={`${inputCls} mt-1`} value={this.state.head} onChange={(e) => this.setState({ head: e.target.value, error: '' })} /></Field>
         <ErrorNote error={this.state.error} />
         <div className="flex items-center gap-2"><button type="submit" className={btnPrimary}>Simpan</button>{deptId && <ConfirmButton onConfirm={() => this.act(() => this.admin.removeDepartment(deptId), 'Department dihapus.') && onDeleted()} />}</div>
       </form>
@@ -52,13 +52,13 @@ class TeamEditor extends AdminTab {
   save = (e) => {
     e.preventDefault();
     const { teamId, onSaved } = this.props;
-    if (teamId) { this.act(() => this.admin.updateTeam(teamId, this.input()), 'Tim diperbarui.'); return; }
+    if (teamId) { this.act(() => this.admin.updateTeam(teamId, this.input()), 'Team diperbarui.'); return; }
     let id = null;
-    if (this.act(() => { id = this.admin.addTeam(this.input()); }, 'Tim ditambahkan. Tambahkan anggotanya di bawah.')) onSaved(id);
+    if (this.act(() => { id = this.admin.addTeam(this.input()); }, 'Team ditambahkan. Tambahkan member-nya di bawah.')) onSaved(id);
   };
   addMember = (e) => {
     e.preventDefault();
-    if (this.act(() => this.admin.addMember(this.props.teamId, { name: this.state.newMember }), 'Anggota ditambahkan.')) this.setState({ newMember: '' });
+    if (this.act(() => this.admin.addMember(this.props.teamId, { name: this.state.newMember }), 'Member ditambahkan.')) this.setState({ newMember: '' });
   };
   patchMember = (m, patch) => this.act(() => this.admin.updateMember(this.props.teamId, m.id, { available: m.available, scope: m.scope || [], ...patch }));
 
@@ -67,8 +67,8 @@ class TeamEditor extends AdminTab {
     const nameOf = (id) => (nodes.find((n) => n.id === id) || {}).name || id;
     return (
       <div className="mt-6 border-t border-slate-100 pt-5">
-        <h3 className="flex items-center gap-2 font-semibold text-slate-950"><Users className="h-4 w-4 text-[var(--brand)]" aria-hidden="true" />Anggota ({team.members.length})</h3>
-        <p className="mt-1 text-xs text-slate-500">PIC dipilih dari anggota yang tersedia dan mencakup lokasi tiket. Tanpa cakupan area = mencakup semua lokasi. Nama anggota tidak bisa diubah; hapus lalu tambah ulang bila perlu.</p>
+        <h3 className="flex items-center gap-2 font-semibold text-slate-950"><Users className="h-4 w-4 text-[var(--brand)]" aria-hidden="true" />Members ({team.members.length})</h3>
+        <p className="mt-1 text-xs text-slate-500">PIC dipilih dari member yang available dan mencakup lokasi tiket. Tanpa area scope = mencakup semua lokasi. Nama member tidak bisa diubah; hapus lalu tambah ulang bila perlu.</p>
         <ul className="mt-3 space-y-2">
           {team.members.map((m) => {
             const scope = m.scope || [];
@@ -76,17 +76,17 @@ class TeamEditor extends AdminTab {
               <li key={m.id} className="rounded-xl border border-slate-200 p-3">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   <span className="min-w-0 flex-1 text-sm font-semibold text-slate-900">{m.name}</span>
-                  <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={m.available} onChange={(e) => this.patchMember(m, { available: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />Tersedia</label>
-                  <ConfirmButton onConfirm={() => this.act(() => this.admin.removeMember(this.props.teamId, m.id), `${m.name} dihapus dari tim.`)} />
+                  <label className="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" checked={m.available} onChange={(e) => this.patchMember(m, { available: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />Available</label>
+                  <ConfirmButton onConfirm={() => this.act(() => this.admin.removeMember(this.props.teamId, m.id), `${m.name} dihapus dari team.`)} />
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="text-xs text-slate-500">Cakupan area:</span>
+                  <span className="text-xs text-slate-500">Area scope:</span>
                   {scope.length === 0 && <span className="text-xs font-medium text-slate-700">Semua lokasi</span>}
                   {scope.map((id) => (
                     <span key={id} className="inline-flex items-center gap-1 rounded-full bg-emerald-50 py-0.5 pl-2.5 pr-1 text-xs font-semibold text-emerald-800">{nameOf(id)}
-                      <button type="button" onClick={() => this.patchMember(m, { scope: scope.filter((x) => x !== id) })} aria-label={`Hapus cakupan ${nameOf(id)} dari ${m.name}`} className="grid h-5 w-5 place-items-center rounded-full hover:bg-emerald-100"><X className="h-3 w-3" aria-hidden="true" /></button></span>
+                      <button type="button" onClick={() => this.patchMember(m, { scope: scope.filter((x) => x !== id) })} aria-label={`Hapus scope ${nameOf(id)} dari ${m.name}`} className="grid h-5 w-5 place-items-center rounded-full hover:bg-emerald-100"><X className="h-3 w-3" aria-hidden="true" /></button></span>
                   ))}
-                  <select aria-label={`Tambah cakupan area untuk ${m.name}`} value="" onChange={(e) => e.target.value && this.patchMember(m, { scope: [...scope, e.target.value] })} className="min-h-[32px] rounded-lg border border-slate-200 bg-white px-2 text-xs">
+                  <select aria-label={`Tambah area scope untuk ${m.name}`} value="" onChange={(e) => e.target.value && this.patchMember(m, { scope: [...scope, e.target.value] })} className="min-h-[32px] rounded-lg border border-slate-200 bg-white px-2 text-xs">
                     <option value="">+ Tambah area…</option>
                     {nodes.filter((n) => !scope.includes(n.id)).map((n) => <option key={n.id} value={n.id}>{pathText(nodes, n.id)}</option>)}
                   </select>
@@ -94,11 +94,11 @@ class TeamEditor extends AdminTab {
               </li>
             );
           })}
-          {!team.members.length && <li className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">Belum ada anggota. Tiket akan diteruskan ke ketua tim.</li>}
+          {!team.members.length && <li className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">Belum ada member. Tiket akan diteruskan ke team lead.</li>}
         </ul>
         <form onSubmit={this.addMember} className="mt-3 flex gap-2">
-          <label htmlFor="member-name" className="sr-only">Nama anggota baru</label>
-          <input id="member-name" className={inputCls} value={this.state.newMember} onChange={this.set('newMember')} placeholder="Nama anggota baru" />
+          <label htmlFor="member-name" className="sr-only">Nama member baru</label>
+          <input id="member-name" className={inputCls} value={this.state.newMember} onChange={this.set('newMember')} placeholder="Nama member baru" />
           <button type="submit" className={btnSecondary}><Plus className="h-4 w-4" aria-hidden="true" />Tambah</button>
         </form>
       </div>
@@ -114,32 +114,32 @@ class TeamEditor extends AdminTab {
     return (
       <div>
         <form onSubmit={this.save} className="space-y-4">
-          <h2 className="font-semibold text-slate-950">{teamId ? 'Ubah tim' : 'Tim baru'}</h2>
+          <h2 className="font-semibold text-slate-950">{teamId ? 'Ubah team' : 'Team baru'}</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Nama tim" htmlFor="team-name"><input id="team-name" className={`${inputCls} mt-1`} value={s.name} onChange={this.set('name')} /></Field>
+            <Field label="Nama team" htmlFor="team-name"><input id="team-name" className={`${inputCls} mt-1`} value={s.name} onChange={this.set('name')} /></Field>
             <Field label="Department" htmlFor="team-dept">
               <select id="team-dept" className={`${inputCls} mt-1`} value={s.department} onChange={this.set('department')}>
                 <option value="">Pilih department…</option>{Object.entries(container.departments).map(([k, d]) => <option key={k} value={k}>{d.name}</option>)}
               </select>
             </Field>
-            <Field label="Ketua tim" htmlFor="team-lead" hint="Menerima eskalasi SLA level 1."><input id="team-lead" className={`${inputCls} mt-1`} value={s.lead} onChange={this.set('lead')} /></Field>
-            <Field label="Tim on-call" htmlFor="team-oncall" hint="Menerima tiket di luar jam kerja.">
+            <Field label="Team lead" htmlFor="team-lead" hint="Menerima escalation SLA level 1."><input id="team-lead" className={`${inputCls} mt-1`} value={s.lead} onChange={this.set('lead')} /></Field>
+            <Field label="On-call team" htmlFor="team-oncall" hint="Menerima tiket di luar working hours.">
               <select id="team-oncall" className={`${inputCls} mt-1`} value={s.onCall} onChange={this.set('onCall')}>
                 <option value="">Tidak ada</option>{others.map(([k, t]) => <option key={k} value={k}>{t.name}</option>)}
               </select>
             </Field>
           </div>
-          <label className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" checked={s.external} onChange={(e) => this.setState({ external: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />Tim eksternal (vendor / pihak luar)</label>
+          <label className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" checked={s.external} onChange={(e) => this.setState({ external: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />External team (vendor / pihak luar)</label>
 
           <fieldset className="rounded-xl border border-slate-200 p-4">
-            <legend className="px-1 text-sm font-medium text-slate-800">Jam kerja (WIB)</legend>
+            <legend className="px-1 text-sm font-medium text-slate-800">Working hours (WIB)</legend>
             <div className="flex gap-4 text-sm">
-              <label className="flex items-center gap-2"><input type="radio" name="hours" checked={!s.sched} onChange={() => this.setState({ sched: false })} className="accent-[var(--brand)]" />24 jam</label>
-              <label className="flex items-center gap-2"><input type="radio" name="hours" checked={s.sched} onChange={() => this.setState({ sched: true })} className="accent-[var(--brand)]" />Terjadwal</label>
+              <label className="flex items-center gap-2"><input type="radio" name="hours" checked={!s.sched} onChange={() => this.setState({ sched: false })} className="accent-[var(--brand)]" />24 hours</label>
+              <label className="flex items-center gap-2"><input type="radio" name="hours" checked={s.sched} onChange={() => this.setState({ sched: true })} className="accent-[var(--brand)]" />Scheduled</label>
             </div>
             {s.sched && (
               <div className="mt-3 space-y-3">
-                <div className="flex flex-wrap gap-2" role="group" aria-label="Hari kerja">
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Working days">
                   {DAYS.map(([d, l]) => <button key={d} type="button" aria-pressed={s.days.includes(d)} onClick={() => this.toggleDay(d)} className={`min-h-[40px] min-w-[48px] rounded-lg border px-3 text-sm font-semibold ${s.days.includes(d) ? 'border-[var(--brand)] bg-emerald-50 text-[var(--brand)]' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{l}</button>)}
                 </div>
                 <div className="flex items-center gap-3 text-sm">
@@ -152,10 +152,10 @@ class TeamEditor extends AdminTab {
           <ErrorNote error={s.error} />
           <div className="flex items-center gap-2">
             <button type="submit" className={btnPrimary}>Simpan</button>
-            {teamId && <ConfirmButton onConfirm={() => this.act(() => this.admin.removeTeam(teamId), 'Tim dihapus.') && onDeleted()} />}
+            {teamId && <ConfirmButton onConfirm={() => this.act(() => this.admin.removeTeam(teamId), 'Team dihapus.') && onDeleted()} />}
           </div>
         </form>
-        {team ? this.renderMembers(team) : <p className="mt-5 text-sm text-slate-500">Simpan tim ini dulu, lalu tambahkan anggotanya.</p>}
+        {team ? this.renderMembers(team) : <p className="mt-5 text-sm text-slate-500">Simpan team ini dulu, lalu tambahkan member-nya.</p>}
       </div>
     );
   }
@@ -173,27 +173,27 @@ export default class AdminTeams extends AdminTab {
     const teams = Object.entries(container.teams);
     const item = (active) => `flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm ${active ? 'bg-emerald-50 font-semibold text-[var(--brand)]' : 'text-slate-700 hover:bg-slate-50'}`;
     return (
-      <div className="grid items-start gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-slate-200 bg-white p-3" aria-label="Daftar department dan tim">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+        <section className="rounded-2xl border border-slate-200 bg-white p-3" aria-label="Daftar department dan team">
           {depts.map(([id, d]) => (
             <div key={id} className="mb-3 last:mb-0">
               <button type="button" onClick={() => this.select({ kind: 'dept', id })} className={`${item(sel && sel.kind === 'dept' && sel.id === id)} !font-semibold`} aria-label={`Department ${d.name}`}>
-                <span>{d.name}</span><span className="text-xs font-normal text-slate-500">Kepala: {d.head}</span>
+                <span>{d.name}</span><span className="text-xs font-normal text-slate-500">Head: {d.head}</span>
               </button>
               <ul className="ml-3 border-l border-slate-100 pl-2">
                 {teams.filter(([, t]) => t.department === id).map(([tid, t]) => (
                   <li key={tid}><button type="button" onClick={() => this.select({ kind: 'team', id: tid })} className={item(sel && sel.kind === 'team' && sel.id === tid)}>
-                    <span className="min-w-0"><span className="block truncate">{t.name}{t.external ? ' (vendor)' : ''}</span><span className="block text-xs font-normal text-slate-500">{t.members.length} anggota · {hoursText(t.hours)}</span></span>
+                    <span className="min-w-0"><span className="block truncate">{t.name}{t.external ? ' (vendor)' : ''}</span><span className="block text-xs font-normal text-slate-500">{t.members.length} member{t.members.length === 1 ? '' : 's'} · {hoursText(t.hours)}</span></span>
                   </button></li>
                 ))}
-                <li><button type="button" onClick={() => this.select({ kind: 'newTeam', dept: id })} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--brand)] hover:bg-emerald-50"><Plus className="h-3.5 w-3.5" aria-hidden="true" />Tim di {d.name}</button></li>
+                <li><button type="button" onClick={() => this.select({ kind: 'newTeam', dept: id })} className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-[var(--brand)] hover:bg-emerald-50"><Plus className="h-3.5 w-3.5" aria-hidden="true" />Team di {d.name}</button></li>
               </ul>
             </div>
           ))}
           <button type="button" onClick={() => this.select({ kind: 'newDept' })} className={`${btnSmall} mt-2 w-full border border-dashed border-slate-300 text-slate-700 hover:bg-slate-50`}><Plus className="h-3.5 w-3.5" aria-hidden="true" />Department baru</button>
         </section>
         <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Editor">
-          {!sel && <p className="text-sm text-slate-500">Pilih department atau tim di sebelah kiri untuk mengubahnya, atau tambahkan yang baru.</p>}
+          {!sel && <p className="text-sm text-slate-500">Pilih department atau team di sebelah kiri untuk mengubahnya, atau tambahkan yang baru.</p>}
           {sel && sel.kind === 'dept' && <DepartmentEditor key={`d-${sel.id}`} deptId={sel.id} onSaved={() => {}} onDeleted={() => this.select(null)} />}
           {sel && sel.kind === 'newDept' && <DepartmentEditor key="d-new" deptId={null} onSaved={(id) => this.select({ kind: 'dept', id })} onDeleted={() => {}} />}
           {sel && sel.kind === 'team' && container.teams[sel.id] && <TeamEditor key={`t-${sel.id}`} teamId={sel.id} onSaved={() => {}} onDeleted={() => this.select(null)} />}

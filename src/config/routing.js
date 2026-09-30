@@ -38,7 +38,7 @@ export const TEAMS = {
   ga_general: { name: 'General Affair', department: 'ga', hours: OFFICE, onCall: 'service_desk', lead: 'Ratna Sari', members: [m('ratna', 'Ratna Sari'), m('iwan', 'Iwan Kurnia')] },
   ga_engineering: { name: 'Engineering', department: 'ga', hours: OUTLET, onCall: 'ga_oncall', lead: 'Hasan Basri', members: [m('dewi', 'Dewi Lestari'), m('agus', 'Agus Pratama', { available: false })] },
   ga_oncall: { name: 'Engineering On-Call', department: 'ga', hours: null, lead: 'Hasan Basri', members: [m('joko', 'Joko Widodo')] },
-  vendor_ac: { name: 'Vendor AC & Pendingin', department: 'ga', external: true, hours: { days: [1, 2, 3, 4, 5, 6], from: '08:00', to: '18:00' }, onCall: 'ga_oncall', lead: 'Hasan Basri', members: [m('anton', 'CV Dingin Jaya (Pak Anton)')] },
+  vendor_ac: { name: 'Vendor AC & Cooling', department: 'ga', external: true, hours: { days: [1, 2, 3, 4, 5, 6], from: '08:00', to: '18:00' }, onCall: 'ga_oncall', lead: 'Hasan Basri', members: [m('anton', 'CV Dingin Jaya (Pak Anton)')] },
   dc_maintenance: { name: 'DC Maintenance', department: 'ga', hours: DC, onCall: 'ga_oncall', lead: 'Rudi Hermawan', members: [m('bambang', 'Bambang Susilo'), m('joko2', 'Joko Sutrisno')] },
   // --- Finance, Procurement, Legal
   fin_ap: { name: 'Account Payable', department: 'finance', hours: OFFICE, onCall: 'service_desk', lead: 'Ayu Lestari', members: [m('ayu', 'Ayu Lestari')] },
@@ -56,30 +56,30 @@ export const TEAMS = {
 // Aturan dicek dari atas ke bawah, yang pertama cocok menang. Kondisi yang tidak diisi = cocok semua.
 // Kondisi boleh berupa nilai tunggal atau daftar. kind = jenis lokasi, sub = subkategori, type = jenis kebutuhan.
 export const ROUTING_RULES = [
-  { id: 'keluhan', type: 'complaint', team: 'service_desk' },
+  { id: 'complaint', type: 'complaint', team: 'service_desk' },
   // IT: masalah yang sama, PIC berbeda menurut lokasi
   { id: 'it-pos', category: 'it', sub: 'pos', team: 'it_area' },
-  { id: 'it-jaringan-outlet', category: 'it', sub: 'network', kind: 'outlet', team: 'it_area' },
-  { id: 'it-jaringan-ho', category: 'it', sub: 'network', kind: 'head_office', team: 'it_helpdesk' },
-  { id: 'it-jaringan-dc', category: 'it', sub: 'network', kind: 'warehouse', team: 'it_infra' },
+  { id: 'it-network-outlet', category: 'it', sub: 'network', kind: 'outlet', team: 'it_area' },
+  { id: 'it-network-ho', category: 'it', sub: 'network', kind: 'head_office', team: 'it_helpdesk' },
+  { id: 'it-network-dc', category: 'it', sub: 'network', kind: 'warehouse', team: 'it_infra' },
   { id: 'it-enduser', category: 'it', sub: 'enduser', team: 'it_helpdesk' },
-  { id: 'it-aplikasi', category: 'it', sub: 'bizapp', team: 'it_bizapp' },
+  { id: 'it-application', category: 'it', sub: 'bizapp', team: 'it_bizapp' },
   { id: 'it-wms', category: 'it', sub: 'wms', team: 'it_wms' },
   { id: 'it-outlet', category: 'it', kind: 'outlet', team: 'it_area' },
   { id: 'it-ho', category: 'it', kind: 'head_office', team: 'it_helpdesk' },
   { id: 'it-dc', category: 'it', kind: 'warehouse', team: 'it_infra' },
   // GA & Facility
   { id: 'ac-vendor', category: 'utilitas', sub: 'ac', team: 'vendor_ac' },
-  { id: 'utilitas', category: 'utilitas', team: 'ga_engineering' },
+  { id: 'utilities', category: 'utilitas', team: 'ga_engineering' },
   { id: 'forklift', category: 'peralatan', sub: 'forklift', team: 'dc_maintenance' },
-  { id: 'peralatan-dc', category: 'peralatan', kind: 'warehouse', team: 'dc_maintenance' },
-  { id: 'peralatan', category: 'peralatan', team: 'ga_engineering' },
-  { id: 'kebutuhan-kantor', category: 'fasilitas', sub: 'kantor', team: 'ga_general' },
-  { id: 'fasilitas', category: 'fasilitas', team: 'ga_facility' },
-  { id: 'keamanan', category: 'keamanan', team: 'security' },
+  { id: 'equipment-dc', category: 'peralatan', kind: 'warehouse', team: 'dc_maintenance' },
+  { id: 'equipment', category: 'peralatan', team: 'ga_engineering' },
+  { id: 'office-supplies', category: 'fasilitas', sub: 'kantor', team: 'ga_general' },
+  { id: 'facility', category: 'fasilitas', team: 'ga_facility' },
+  { id: 'security', category: 'keamanan', team: 'security' },
   // Operations
-  { id: 'stok-dc', category: 'stok', kind: 'warehouse', team: 'warehouse' },
-  { id: 'stok-outlet', category: 'stok', team: 'inventory' },
+  { id: 'stock-dc', category: 'stok', kind: 'warehouse', team: 'warehouse' },
+  { id: 'stock-outlet', category: 'stok', team: 'inventory' },
   // HR, Finance, Procurement, Legal
   { id: 'hr-recruitment', category: 'hr', sub: 'recruitment', team: 'hr_recruit' },
   { id: 'hr-payroll', category: 'hr', sub: 'payroll', team: 'hr_payroll' },

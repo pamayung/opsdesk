@@ -5,11 +5,11 @@ export const DEFAULT_CATEGORIES = [
   { id: 'it', name: 'Komputer & Jaringan' },
   { id: 'utilitas', name: 'Listrik, Air & AC' },
   { id: 'fasilitas', name: 'Kebersihan & Fasilitas' },
-  { id: 'stok', name: 'Stok & Persediaan' },
-  { id: 'keamanan', name: 'Keamanan & Keselamatan' },
-  { id: 'hr', name: 'HR & Kepegawaian' },
-  { id: 'keuangan', name: 'Keuangan' },
-  { id: 'pengadaan', name: 'Pengadaan' },
+  { id: 'stok', name: 'Stock & Inventory' },
+  { id: 'keamanan', name: 'Security & Safety' },
+  { id: 'hr', name: 'HR' },
+  { id: 'keuangan', name: 'Finance' },
+  { id: 'pengadaan', name: 'Procurement' },
   { id: 'legal', name: 'Legal' },
 ];
 

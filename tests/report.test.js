@@ -62,10 +62,10 @@ eq('rincian department (masuk + terlewat)', r.by.department.map((g) => [g.label,
 eq('rincian prioritas urut P1..P3', r.by.priority.map((g) => [g.key, g.total]), [['P1', 1], ['P2', 1], ['P3', 2]]);
 eq('rincian lokasi', r.by.location.map((g) => [g.label, g.total]), [['Senopati', 2], ['Head Office', 1], ['PIM', 1]]);
 eq('kinerja tim', r.teams.map((g) => [g.label, g.total, g.resolved]), [['IT Support Area', 2, 2], ['Engineering', 1, 1], ['HR Service', 1, 0]]);
-eq('beban PIC (tanpa PIC = "Belum diambil")', r.pics.map((g) => [g.label, g.total]), [['Kevin', 2], ['Belum diambil', 1], ['Dewi', 1]].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
+eq('beban PIC (tanpa PIC = "Belum diambil")', r.pics.map((g) => [g.label, g.total]), [['Kevin', 2], ['Unassigned', 1], ['Dewi', 1]].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])));
 
 // ===== Umur tiket terbuka (tidak dibatasi periode) & tiket terlambat
-eq('umur tiket terbuka: C 7 jam, F 10 hari', r.aging.filter((a) => a.count).map((a) => [a.label, a.count, a.atRisk]), [['4–24 jam', 1, 1], ['> 3 hari', 1, 1]]);
+eq('umur tiket terbuka: C 7 jam, F 10 hari', r.aging.filter((a) => a.count).map((a) => [a.label, a.count, a.atRisk]), [['4–24 hr', 1, 1], ['> 3 days', 1, 1]]);
 eq('tiket terbuka saat ini', r.openNow, 2);
 eq('tiket terlambat diurut dari yang paling lewat (C 300 mnt, B 15 mnt)', r.late.map((l) => [l.id, Math.round(l.overshootMin)]), [['C', 300], ['B', 15]]);
 
@@ -93,8 +93,8 @@ eq('umur tiket terbuka juga dibatasi hak akses (karyawan Citra: hanya C)', build
 const rows = exportRows(r.tickets, { ...ctx, names });
 eq('ekspor: header + 4 baris', [rows.length, rows[0][0], rows[0].length], [5, 'ID', 17]);
 const rowB = rows.find((x) => x[0] === 'B');
-eq('ekspor: baris B (WIB, menit, SLA terlewat)', [rowB[1], rowB[2], rowB[3], rowB[12], rowB[13], rowB[14], rowB[15]], ['2026-09-30 08:00', 'Insiden', 'P1', 20, 45, 30, 'Ya']);
-eq('ekspor: tiket terbuka: respons/penyelesaian kosong, status Baru', (({ 11: st, 12: rs, 13: rl }) => [st, rs, rl])(rows.find((x) => x[0] === 'C')), ['Baru', '', '']);
+eq('ekspor: baris B (WIB, menit, SLA terlewat)', [rowB[1], rowB[2], rowB[3], rowB[12], rowB[13], rowB[14], rowB[15]], ['2026-09-30 08:00', 'Incident', 'P1', 20, 45, 30, 'Ya']);
+eq('ekspor: tiket terbuka: respons/penyelesaian kosong, status Open', (({ 11: st, 12: rs, 13: rl }) => [st, rs, rl])(rows.find((x) => x[0] === 'C')), ['Open', '', '']);
 eq('CSV: kutip koma, tanda kutip, baris baru', toCsv([['a', 'b,c', 'd"e', 'x\ny']]), 'a,"b,c","d""e","x\ny"');
 eq('CSV: rumus Excel dinetralkan (teks berawalan = + - @)', toCsv([['=SUM(A1)', '+1', '-2x', '@cmd']]), "'=SUM(A1),'+1,'-2x,'@cmd");
 eq('CSV: angka negatif & null tidak diubah', toCsv([[-5, null, 0]]), '-5,,0');

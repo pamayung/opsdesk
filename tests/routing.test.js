@@ -24,7 +24,7 @@ eq('Outlet: POS error di Senopati (Area 1) -> IT / IT Support Area / Kevin', rou
 eq('Outlet: POS error di BSD (Area 2) -> PIC area lain (Budi)', route3('it', 'pos', 'BSD'), ['IT', 'IT Support Area', 'Budi Santoso']);
 eq('Outlet: Toilet rusak di Kemang -> GA / Facility / PIC area 1', route3('fasilitas', 'toilet', 'Kemang'), ['GA & Facility', 'Facility', 'Sri Wahyuni']);
 eq('Outlet: Toilet rusak di PIM -> Facility / PIC area 2', route3('fasilitas', 'toilet', 'PIM'), ['GA & Facility', 'Facility', 'Wawan Setiawan']);
-eq('Outlet: AC tidak dingin -> GA / Vendor (eksternal)', [go('utilitas', 'ac', 'Kemang').dept, go('utilitas', 'ac', 'Kemang').team, go('utilitas', 'ac', 'Kemang').ext], ['GA & Facility', 'Vendor AC & Pendingin', true]);
+eq('Outlet: AC tidak dingin -> GA / Vendor (eksternal)', [go('utilitas', 'ac', 'Kemang').dept, go('utilitas', 'ac', 'Kemang').team, go('utilitas', 'ac', 'Kemang').ext], ['GA & Facility', 'Vendor AC & Cooling', true]);
 // === 2. Head Office
 eq('HO: Laptop rusak -> IT / IT Helpdesk', route3('it', 'enduser', 'Head Office').slice(0, 2), ['IT', 'IT Helpdesk']);
 eq('HO: Tidak bisa akses SAP -> IT / SAP Support', route3('it', 'bizapp', 'Head Office').slice(0, 2), ['IT', 'SAP Support']);

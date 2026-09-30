@@ -79,8 +79,8 @@ export default class AdminService {
     const used = this.tickets.list().filter((t) => t.branch === cur.name).length;
     if (used) throw new Error(`"${cur.name}" dipakai ${used} tiket, jadi tidak bisa dihapus.`);
     const teams = Object.values(this.doc.teams).filter((t) => t.members.some((m) => (m.scope || []).includes(id))).map((t) => t.name);
-    if (teams.length) throw new Error(`"${cur.name}" dipakai sebagai cakupan area di tim: ${teams.join(', ')}.`);
-    if (this.doc.users.some((u) => u.location === cur.name)) throw new Error(`"${cur.name}" dipakai sebagai lokasi pengguna.`);
+    if (teams.length) throw new Error(`"${cur.name}" dipakai sebagai area scope di team: ${teams.join(', ')}.`);
+    if (this.doc.users.some((u) => u.location === cur.name)) throw new Error(`"${cur.name}" dipakai sebagai lokasi user.`);
     this.locations.remove(id);
   }
 
@@ -105,7 +105,7 @@ export default class AdminService {
     if (!cat) throw new Error('Kategori tidak ditemukan.');
     const used = this.usage().byCategory[id] || 0;
     if (used) throw new Error(`"${cat.name}" dipakai ${used} tiket, jadi tidak bisa dihapus.`);
-    if (this.doc.rules.some((r) => r.category === id)) throw new Error(`"${cat.name}" dipakai aturan routing. Hapus atau ubah aturannya dulu.`);
+    if (this.doc.rules.some((r) => r.category === id)) throw new Error(`"${cat.name}" dipakai routing rules. Hapus atau ubah rule-nya dulu.`);
     this.categories.remove(id);
     this.edit((d) => { delete d.catalog[id]; });
   }
@@ -137,7 +137,7 @@ export default class AdminService {
       const subs = d.catalog[categoryId] || [];
       const sub = subs.find((s) => s.id === subId);
       if (!sub) throw new Error('Subkategori tidak ditemukan.');
-      if (d.rules.some((r) => r.category === categoryId && r.sub === subId)) throw new Error(`"${sub.name}" dipakai aturan routing. Hapus atau ubah aturannya dulu.`);
+      if (d.rules.some((r) => r.category === categoryId && r.sub === subId)) throw new Error(`"${sub.name}" dipakai routing rules. Hapus atau ubah rule-nya dulu.`);
       d.catalog[categoryId] = subs.filter((s) => s.id !== subId);
     });
   }
@@ -169,7 +169,7 @@ export default class AdminService {
   addDepartment({ name, head }) {
     const n = cleanName(name); const h = cleanName(head);
     if (!n) throw new Error('Nama department wajib diisi.');
-    if (!h) throw new Error('Isi nama kepala department.');
+    if (!h) throw new Error('Isi nama department head.');
     return this.edit((d) => {
       if (Object.values(d.departments).some((x) => normalize(x.name) === normalize(n))) throw new Error(`Department "${n}" sudah ada.`);
       const id = uniqueId(slug(n), new Set(Object.keys(d.departments)));
@@ -180,7 +180,7 @@ export default class AdminService {
   updateDepartment(id, { name, head }) {
     const n = cleanName(name); const h = cleanName(head);
     if (!n) throw new Error('Nama department wajib diisi.');
-    if (!h) throw new Error('Isi nama kepala department.');
+    if (!h) throw new Error('Isi nama department head.');
     this.edit((d) => {
       if (!d.departments[id]) throw new Error('Department tidak ditemukan.');
       if (Object.entries(d.departments).some(([k, x]) => k !== id && normalize(x.name) === normalize(n))) throw new Error(`Department "${n}" sudah ada.`);
@@ -191,29 +191,29 @@ export default class AdminService {
     this.edit((d) => {
       if (!d.departments[id]) throw new Error('Department tidak ditemukan.');
       const teams = Object.values(d.teams).filter((t) => t.department === id).length;
-      if (teams) throw new Error(`Department ini masih punya ${teams} tim. Pindahkan atau hapus timnya dulu.`);
-      if (d.users.some((u) => u.department === id)) throw new Error('Department ini dipakai sebagai department manajer.');
+      if (teams) throw new Error(`Department ini masih punya ${teams} team. Pindahkan atau hapus team-nya dulu.`);
+      if (d.users.some((u) => u.department === id)) throw new Error('Department ini dipakai sebagai department manager.');
       delete d.departments[id];
     });
   }
   // Validasi bagian pengaturan tim (tanpa anggota). Mengembalikan objek tim yang bersih.
   _team(input, d, selfId) {
     const name = cleanName(input.name); const lead = cleanName(input.lead);
-    if (!name) throw new Error('Nama tim wajib diisi.');
-    if (Object.entries(d.teams).some(([k, t]) => k !== selfId && normalize(t.name) === normalize(name))) throw new Error(`Tim "${name}" sudah ada.`);
-    if (!d.departments[input.department]) throw new Error('Pilih department tim.');
-    if (!lead) throw new Error('Isi nama ketua tim.');
+    if (!name) throw new Error('Nama team wajib diisi.');
+    if (Object.entries(d.teams).some(([k, t]) => k !== selfId && normalize(t.name) === normalize(name))) throw new Error(`Team "${name}" sudah ada.`);
+    if (!d.departments[input.department]) throw new Error('Pilih department team.');
+    if (!lead) throw new Error('Isi nama team lead.');
     if (input.onCall) {
-      if (input.onCall === selfId) throw new Error('Tim on-call tidak boleh tim itu sendiri.');
-      if (!d.teams[input.onCall]) throw new Error('Tim on-call tidak ditemukan.');
+      if (input.onCall === selfId) throw new Error('On-call team tidak boleh team itu sendiri.');
+      if (!d.teams[input.onCall]) throw new Error('On-call team tidak ditemukan.');
     }
     let hours = null;
     if (input.hours) {
       const h = input.hours;
       const days = [...new Set((h.days || []).map(Number))].filter((x) => x >= 1 && x <= 7).sort();
       if (!days.length) throw new Error('Pilih minimal satu hari kerja.');
-      if (!HHMM.test(h.from) || !HHMM.test(h.to)) throw new Error('Jam kerja harus berformat JJ:MM.');
-      if (h.from >= h.to) throw new Error('Jam mulai harus lebih awal dari jam selesai.');
+      if (!HHMM.test(h.from) || !HHMM.test(h.to)) throw new Error('Working hours harus berformat HH:MM.');
+      if (h.from >= h.to) throw new Error('Start time harus lebih awal dari end time.');
       hours = { days, from: h.from, to: h.to };
     }
     const out = { name, department: input.department, hours, lead };
@@ -231,7 +231,7 @@ export default class AdminService {
   }
   updateTeam(id, input) {
     this.edit((d) => {
-      if (!d.teams[id]) throw new Error('Tim tidak ditemukan.');
+      if (!d.teams[id]) throw new Error('Team tidak ditemukan.');
       const team = this._team(input, d, id);
       d.teams[id] = { ...team, members: d.teams[id].members };
     });
@@ -239,29 +239,29 @@ export default class AdminService {
   removeTeam(id) {
     this.edit((d) => {
       const t = d.teams[id];
-      if (!t) throw new Error('Tim tidak ditemukan.');
+      if (!t) throw new Error('Team tidak ditemukan.');
       const rules = d.rules.filter((r) => r.team === id).length;
-      if (rules) throw new Error(`"${t.name}" dipakai ${rules} aturan routing. Ubah tujuan aturannya dulu.`);
+      if (rules) throw new Error(`"${t.name}" dipakai ${rules} routing rules. Ubah tujuan rule-nya dulu.`);
       const cover = Object.values(d.teams).filter((x) => x.onCall === id).map((x) => x.name);
-      if (cover.length) throw new Error(`"${t.name}" menjadi tim on-call untuk: ${cover.join(', ')}.`);
-      if (d.users.some((u) => (u.teamIds || []).includes(id))) throw new Error(`"${t.name}" masih dipakai pengguna (PIC).`);
+      if (cover.length) throw new Error(`"${t.name}" menjadi on-call team untuk: ${cover.join(', ')}.`);
+      if (d.users.some((u) => (u.teamIds || []).includes(id))) throw new Error(`"${t.name}" masih dipakai user (PIC).`);
       delete d.teams[id];
     });
   }
   _scope(scope) {
     const ids = [...new Set(scope || [])];
     const bad = ids.find((s) => !this.locations.findById(s));
-    if (bad) throw new Error('Cakupan area berisi lokasi yang tidak ada.');
+    if (bad) throw new Error('Area scope berisi lokasi yang tidak ada.');
     return ids;
   }
   addMember(teamId, { name, available = true, scope = [] }) {
     const n = cleanName(name);
-    if (!n) throw new Error('Nama anggota wajib diisi.');
+    if (!n) throw new Error('Nama member wajib diisi.');
     const ids = this._scope(scope);
     this.edit((d) => {
       const t = d.teams[teamId];
-      if (!t) throw new Error('Tim tidak ditemukan.');
-      if (t.members.some((m) => normalize(m.name) === normalize(n))) throw new Error(`"${n}" sudah menjadi anggota tim ini.`);
+      if (!t) throw new Error('Team tidak ditemukan.');
+      if (t.members.some((m) => normalize(m.name) === normalize(n))) throw new Error(`"${n}" sudah menjadi member team ini.`);
       t.members.push({ id: uniqueId(slug(n), new Set(t.members.map((m) => m.id))), name: n, available: !!available, ...(ids.length ? { scope: ids } : {}) });
     });
   }
@@ -270,7 +270,7 @@ export default class AdminService {
     const ids = this._scope(scope);
     this.edit((d) => {
       const m = ((d.teams[teamId] || {}).members || []).find((x) => x.id === memberId);
-      if (!m) throw new Error('Anggota tidak ditemukan.');
+      if (!m) throw new Error('Member tidak ditemukan.');
       m.available = !!available;
       if (ids.length) m.scope = ids; else delete m.scope;
     });
@@ -278,8 +278,8 @@ export default class AdminService {
   removeMember(teamId, memberId) {
     this.edit((d) => {
       const t = d.teams[teamId];
-      if (!t) throw new Error('Tim tidak ditemukan.');
-      if (!t.members.some((m) => m.id === memberId)) throw new Error('Anggota tidak ditemukan.');
+      if (!t) throw new Error('Team tidak ditemukan.');
+      if (!t.members.some((m) => m.id === memberId)) throw new Error('Member tidak ditemukan.');
       t.members = t.members.filter((m) => m.id !== memberId);
     });
   }
@@ -289,7 +289,7 @@ export default class AdminService {
   _rule(input, d) {
     const r = {};
     if (input.category) {
-      if (!this.categories.findById(input.category)) throw new Error('Kategori aturan tidak ditemukan.');
+      if (!this.categories.findById(input.category)) throw new Error('Kategori rule tidak ditemukan.');
       r.category = input.category;
     }
     if (input.sub) {
@@ -297,10 +297,10 @@ export default class AdminService {
       if (!(d.catalog[r.category] || []).some((s) => s.id === input.sub)) throw new Error('Subkategori tidak ada di kategori itu.');
       r.sub = input.sub;
     }
-    if (input.type) { if (!REQUEST_TYPES[input.type]) throw new Error('Jenis kebutuhan tidak dikenal.'); r.type = input.type; }
+    if (input.type) { if (!REQUEST_TYPES[input.type]) throw new Error('Request type tidak dikenal.'); r.type = input.type; }
     if (input.kind) { if (!LOCATION_KINDS[input.kind]) throw new Error('Jenis lokasi tidak dikenal.'); r.kind = input.kind; }
-    if (!Object.keys(r).length) throw new Error('Aturan harus punya minimal satu kondisi.');
-    if (!d.teams[input.team]) throw new Error('Pilih tim tujuan.');
+    if (!Object.keys(r).length) throw new Error('Rule harus punya minimal satu kondisi.');
+    if (!d.teams[input.team]) throw new Error('Pilih team tujuan.');
     r.team = input.team;
     return r;
   }
@@ -320,9 +320,9 @@ export default class AdminService {
   updateRule(id, input) {
     this.edit((d) => {
       const i = d.rules.findIndex((r) => r.id === id);
-      if (i < 0) throw new Error('Aturan tidak ditemukan.');
+      if (i < 0) throw new Error('Rule tidak ditemukan.');
       if (id === DEFAULT_RULE_ID) {
-        if (!d.teams[input.team]) throw new Error('Pilih tim tujuan.');
+        if (!d.teams[input.team]) throw new Error('Pilih team tujuan.');
         d.rules[i] = { id, team: input.team };
         return;
       }
@@ -330,9 +330,9 @@ export default class AdminService {
     });
   }
   removeRule(id) {
-    if (id === DEFAULT_RULE_ID) throw new Error('Aturan bawaan (semua lainnya) tidak bisa dihapus.');
+    if (id === DEFAULT_RULE_ID) throw new Error('Default rule (semua lainnya) tidak bisa dihapus.');
     this.edit((d) => {
-      if (!d.rules.some((r) => r.id === id)) throw new Error('Aturan tidak ditemukan.');
+      if (!d.rules.some((r) => r.id === id)) throw new Error('Rule tidak ditemukan.');
       d.rules = d.rules.filter((r) => r.id !== id);
     });
   }
@@ -341,7 +341,7 @@ export default class AdminService {
     this.edit((d) => {
       const movable = d.rules.filter((r) => r.id !== DEFAULT_RULE_ID);
       const i = movable.findIndex((r) => r.id === id);
-      if (i < 0) throw new Error('Aturan tidak ditemukan.');
+      if (i < 0) throw new Error('Rule tidak ditemukan.');
       const j = i + dir;
       if (j < 0 || j >= movable.length) return;
       [movable[i], movable[j]] = [movable[j], movable[i]];
@@ -351,29 +351,29 @@ export default class AdminService {
 
   // ================= PENGGUNA =================
   _user(input, d) {
-    if (!this.roles.includes(input.role)) throw new Error('Pilih peran pengguna.');
+    if (!this.roles.includes(input.role)) throw new Error('Pilih role user.');
     const u = { role: input.role, title: cleanName(input.title) };
     if (input.role === 'manager') {
-      if (!d.departments[input.department]) throw new Error('Manajer department harus memilih department.');
+      if (!d.departments[input.department]) throw new Error('Department Manager harus memilih department.');
       u.department = input.department;
     }
     if (input.role === 'pic') {
       const ids = [...new Set(input.teamIds || [])];
-      if (!ids.length) throw new Error('PIC harus tergabung di minimal satu tim.');
-      if (ids.some((t) => !d.teams[t])) throw new Error('Tim PIC tidak ditemukan.');
+      if (!ids.length) throw new Error('PIC harus tergabung di minimal satu team.');
+      if (ids.some((t) => !d.teams[t])) throw new Error('Team PIC tidak ditemukan.');
       u.teamIds = ids;
     }
     if (input.role === 'employee' && input.location) {
-      if (!this.locations.findByName(input.location)) throw new Error('Lokasi pengguna tidak ditemukan.');
+      if (!this.locations.findByName(input.location)) throw new Error('Lokasi user tidak ditemukan.');
       u.location = input.location;
     }
     return u;
   }
   addUser(input) {
     const name = cleanName(input.name);
-    if (!name) throw new Error('Nama pengguna wajib diisi.');
+    if (!name) throw new Error('Nama user wajib diisi.');
     return this.edit((d) => {
-      if (d.users.some((x) => normalize(x.name) === normalize(name))) throw new Error(`Pengguna "${name}" sudah ada.`);
+      if (d.users.some((x) => normalize(x.name) === normalize(name))) throw new Error(`User "${name}" sudah ada.`);
       const u = { id: uniqueId(slug(name), new Set(d.users.map((x) => x.id))), name, ...this._user(input, d) };
       d.users.push(u);
       return u.id;
@@ -383,7 +383,7 @@ export default class AdminService {
   updateUser(id, input) {
     this.edit((d) => {
       const i = d.users.findIndex((u) => u.id === id);
-      if (i < 0) throw new Error('Pengguna tidak ditemukan.');
+      if (i < 0) throw new Error('User tidak ditemukan.');
       const cur = d.users[i];
       if (cur.role === 'admin' && input.role !== 'admin' && d.users.filter((u) => u.role === 'admin').length === 1) throw new Error('Harus ada minimal satu administrator.');
       d.users[i] = { id, name: cur.name, ...this._user(input, d) };
@@ -392,7 +392,7 @@ export default class AdminService {
   removeUser(id, actorId) {
     this.edit((d) => {
       const u = d.users.find((x) => x.id === id);
-      if (!u) throw new Error('Pengguna tidak ditemukan.');
+      if (!u) throw new Error('User tidak ditemukan.');
       if (id === actorId) throw new Error('Anda tidak bisa menghapus akun yang sedang dipakai.');
       if (u.role === 'admin' && d.users.filter((x) => x.role === 'admin').length === 1) throw new Error('Harus ada minimal satu administrator.');
       d.users = d.users.filter((x) => x.id !== id);

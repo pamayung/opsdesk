@@ -17,9 +17,9 @@ export default class TicketCard extends React.PureComponent {
               <PriorityBadge priority={t.priority} /><StatusBadge status={t.status} />
               <span className="text-xs text-slate-400">#{t.id}</span>
               <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${REQUEST_TYPES[t.type].tone}`}>{REQUEST_TYPES[t.type].label}</span>
-              {esc > 0 && <span className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-700">Eskalasi L{esc}</span>}
-              {urgent && <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[11px] font-bold text-red-700"><AlertTriangle className="h-3 w-3" aria-hidden="true" />Perlu perhatian</span>}
-              {t.escalation && <span className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-800">Eskalasi vendor</span>}
+              {esc > 0 && <span className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-700">Escalation L{esc}</span>}
+              {urgent && <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-[11px] font-bold text-red-700"><AlertTriangle className="h-3 w-3" aria-hidden="true" />Needs attention</span>}
+              {t.escalation && <span className="rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-800">Vendor escalation</span>}
             </div>
             <h3 className="mt-2 break-words text-base font-semibold text-slate-950">
               <button type="button" onClick={() => onOpen(t.id)} className="text-left hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]">{t.title}</button>
@@ -33,13 +33,13 @@ export default class TicketCard extends React.PureComponent {
             </div>
           </div>
           <div className="flex items-center justify-between gap-5 lg:min-w-[190px] lg:flex-col lg:items-end">
-            <div><p className="mb-1 text-xs text-slate-400">Batas SLA</p><SlaTimer ticket={t} now={now} /></div>
+            <div><p className="mb-1 text-xs text-slate-400">SLA deadline</p><SlaTimer ticket={t} now={now} /></div>
             <p className="text-xs text-slate-500">{t.picLabel()}</p>
           </div>
           <div className="lg:w-32">
             {t.status === 'open' && canTake
-              ? <Button className="w-full" onClick={() => onTake(t.id)}>Ambil Tiket</Button>
-              : <Button variant="ghost" className="w-full" onClick={() => onOpen(t.id)}>{t.status === 'done' ? 'Lihat Detail' : 'Buka Detail'}</Button>}
+              ? <Button className="w-full" onClick={() => onTake(t.id)}>Take Ticket</Button>
+              : <Button variant="ghost" className="w-full" onClick={() => onOpen(t.id)}>{t.status === 'done' ? 'View Details' : 'Open Details'}</Button>}
           </div>
         </div>
       </article>

@@ -10,7 +10,7 @@ export default class Ticket {
     }, p);
   }
   static create({ id, type, routing, subId, answers, branch, location, priority, categoryId, title, description, reporter, reporterRole, image }, now = Date.now()) {
-    const notes = [systemNote('Tiket dibuat dan masuk antrean', now)];
+    const notes = [systemNote('Ticket created and added to the queue', now)];
     if (routing) notes.push(routingNote(routing, now));
     if (description || image) {
       notes.push(makeNote({ party: 'reporter', author: reporter, role: reporterRole, text: description, image, at: now }));
@@ -41,8 +41,8 @@ export default class Ticket {
   // PIC yang paling relevan saat ini: yang memegang tiket > PIC awal dari routing.
   picLabel() {
     if (this.assignee) return `PIC · ${this.assignee}`;
-    if (this.routing && this.routing.pic) return `PIC awal · ${this.routing.pic.name}`;
-    return 'Belum ada PIC';
+    if (this.routing && this.routing.pic) return `Initial PIC · ${this.routing.pic.name}`;
+    return 'No PIC yet';
   }
   isMine(name) { return this.assignee === name || (!!this.routing && !!this.routing.pic && this.routing.pic.name === name); }
   // Menit dari tiket dibuat sampai selesai. null bila belum selesai.

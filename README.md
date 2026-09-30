@@ -81,7 +81,7 @@ Tiket di luar akses tidak bisa dibuka meski lewat tautan langsung.
 | `#/` | Dashboard sesuai peran |
 | `#/tiket` | Antrean (pencarian, status, kategori, perlu perhatian SLA, PIC, dan department untuk manajemen) |
 | `#/laporan` | Laporan (lihat bagian di bawah) |
-| `#/tiket/TCK-1042` | Detail: Penanganan (department, tim, PIC), catatan & riwayat, selesaikan tiket, waktu respons |
+| `#/tiket/TCK-1042` | Detail: Assignment (department, tim, PIC), catatan & riwayat, selesaikan tiket, waktu respons |
 | `#/buat` | Buat tiket dengan Routing Preview |
 
 Eskalasi SLA otomatis (dihitung dan ditandai): L1 bila belum direspons melewati target, L2 bila sisa SLA di bawah 25%.
@@ -95,12 +95,12 @@ Tersedia untuk semua peran, isinya otomatis dibatasi hak akses (karyawan: tiketn
   (perbandingan disembunyikan bila periode sebelumnya punya kurang dari 5 tiket agar tidak menyesatkan).
 - **Tren** masuk vs selesai (harian, atau mingguan untuk periode di atas 31 hari), rincian per department / kategori / lokasi / prioritas / jenis,
   **umur tiket terbuka**, **kinerja tim**, **beban dan kinerja PIC**, dan daftar **tiket terlewat SLA** yang paling lama.
-- **Unduh CSV** (17 kolom, UTF-8 dengan BOM agar terbaca benar di Excel; teks berawalan `=`, `+`, `-`, `@` dinetralkan agar tidak dieksekusi sebagai rumus) dan **Cetak / PDF** (tata letak cetak menyembunyikan menu dan filter).
+- **Download CSV** (17 kolom, UTF-8 dengan BOM agar terbaca benar di Excel; teks berawalan `=`, `+`, `-`, `@` dinetralkan agar tidak dieksekusi sebagai rumus) dan **Print / PDF** (tata letak cetak menyembunyikan menu dan filter).
 - Definisi: "masuk" = tiket dibuat pada periode; "selesai" pada KPI = dari tiket masuk itu; pada grafik tren, selesai dihitung menurut tanggal penyelesaian.
   "Terlewat SLA" = tiket aktif yang sudah lewat batas, atau tiket selesai yang ditutup setelah batas.
 - Perhitungan ada di `src/domain/Report.js` (murni dan diuji dengan angka hitungan tangan).
 - **Data contoh**: seed berisi 130 tiket riwayat 60 hari (deterministik) agar tren dan perbandingan periode terlihat. Di browser yang sudah punya data lama,
-  administrator bisa memuatnya dari halaman Admin lewat "Tambah data contoh" (aman diklik berulang).
+  administrator bisa memuatnya dari halaman Admin lewat "Add sample data" (aman diklik berulang).
 
 ## Halaman Admin (`#/admin/...`, khusus Administrator)
 Konfigurasi dikelola dari UI, disimpan di browser, dan langsung dipakai mesin routing, form, dan dashboard.
@@ -108,16 +108,16 @@ Konfigurasi dikelola dari UI, disimpan di browser, dan langsung dipakai mesin ro
 | Tab | Isi |
 |---|---|
 | Lokasi | pohon lokasi: tambah, ubah nama, pindah induk, hapus. Mengganti nama ikut memperbarui tiketnya |
-| Department & Tim | department (kepala), tim (ketua, tim on-call, eksternal, jam kerja per hari), anggota (ketersediaan, cakupan area) |
-| Aturan Routing | tambah, ubah, urutkan, hapus aturan; peringatan aturan yang tak akan pernah dipakai; **Uji routing** (bisa simulasi hari & jam) |
+| Departments & Teams | department (kepala), tim (ketua, tim on-call, eksternal, jam kerja per hari), anggota (ketersediaan, cakupan area) |
+| Routing Rules | tambah, ubah, urutkan, hapus aturan; peringatan aturan yang tak akan pernah dipakai; **Test routing** (bisa simulasi hari & jam) |
 | Kategori & Pertanyaan | kategori, subkategori, dan editor pertanyaan dinamis (teks, angka, pilihan, ya/tidak, wajib) |
-| Pengguna & Peran | tambah, ubah peran, hapus pengguna |
+| Users & Roles | tambah, ubah peran, hapus pengguna |
 
 Validasi ada di `src/domain/Admin.js` (bukan di UI): nama unik, referensi harus ada, dan sesuatu yang masih dipakai tidak boleh dihapus
 (lokasi yang punya turunan / tiket, tim yang dipakai aturan atau tim on-call atau PIC, kategori yang punya tiket, dst.).
 Aturan bawaan (`default`, semua tiket lainnya) selalu paling bawah dan tidak bisa dihapus. Administrator terakhir tidak bisa dihapus atau diturunkan.
 Perubahan hanya berlaku untuk tiket baru; tiket yang sudah ada tidak dirutekan ulang.
-"Kembalikan ke bawaan" mengembalikan department, tim, aturan, katalog, dan pengguna ke nilai di `src/config/*` (lokasi dan kategori tidak berubah).
+"Reset to default" mengembalikan department, tim, aturan, katalog, dan pengguna ke nilai di `src/config/*` (lokasi dan kategori tidak berubah).
 
 ## Yang belum ada
 - Notifikasi (push / email / WhatsApp) dan login sungguhan: butuh backend. Peran dan seluruh konfigurasi admin saat ini tersimpan di sisi browser,
@@ -128,8 +128,34 @@ Perubahan hanya berlaku untuk tiket baru; tiket yang sudah ada tidak dirutekan u
 - Nama pengguna dan anggota tim tidak bisa diubah setelah dibuat (riwayat tiket menautkan lewat nama).
 - Status tiket: Baru → Sedang Ditangani → Selesai.
 
+## Istilah di UI (glosarium)
+Aturannya: **istilah domain memakai English** (yang lazim di ITSM dan sudah dipahami pengguna), sedangkan **kata sehari-hari tetap Indonesian**
+(tiket, lokasi, kategori, nama, judul, foto, catatan, dst.). Kalimat penjelas tetap berbahasa Indonesia.
+
+| Konteks | Sebelumnya | Sekarang |
+|---|---|---|
+| Status | Baru / Sedang Ditangani / Selesai | Open / In Progress / Resolved |
+| Prioritas | Kritis / Tinggi / Sedang / Rendah | Critical / High / Medium / Low |
+| Jenis kebutuhan | Insiden / Permintaan / Keluhan / Pertanyaan | Incident / Request / Complaint / Question |
+| Peran | Karyawan / Manajer Department / Manajemen | Employee / Department Manager / Management |
+| Menu | Ringkasan / Antrean Saya / Tiket Saya / Antrean Department / Semua Tiket / Laporan / Buat Tiket | Dashboard / My Queue / My Tickets / Department Queue / All Tickets / Reports / Report Issue |
+| Dashboard | Perlu perhatian / Kepatuhan SLA / SLA terlewat / Rata-rata penyelesaian / Antrean per tim | Needs attention / SLA compliance / SLA breached / Average resolution / Queue per team |
+| Aksi | Ambil Tiket / Tugaskan / Ganti PIC / Selesaikan Tiket / Eskalasi ke vendor | Take Ticket / Assign / Change PIC / Resolve Ticket / Escalate to vendor |
+| Antrean | Aktif / Semua PIC / Milik saya / Belum diambil / Perlu perhatian SLA | Active / All PIC / Mine / Unassigned / SLA attention |
+| Detail tiket | Penanganan / Waktu Respons | Assignment / Response time |
+| Admin | Aturan Routing / Department & Tim / Pengguna & Peran / Kembalikan ke bawaan | Routing Rules / Departments & Teams / Users & Roles / Reset to default |
+| Umum | tim, anggota, ketua tim, jam kerja, cakupan area, pengguna, aturan | team, member, team lead, working hours, area scope, user, rule |
+
+Di mana mengubahnya: status, prioritas, jenis kebutuhan, dan label SLA ada di `src/domain/constants.js`; peran di `src/config/users.js`;
+menu di `src/presentation/layout/AppShell.jsx`; nama kategori bawaan di `src/config/defaults.js`.
+`tests/terminology.test.js` (bagian dari `npm test` dan CI) gagal bila istilah Indonesian di atas muncul lagi di teks UI; tambahkan atau
+hapus kata di daftar `BANNED` bila kamus Anda berbeda.
+
+Data yang sudah tersimpan di browser: teks bawaan versi lama diperbarui otomatis saat dibuka, **hanya bila persis sama** dengan nilai bawaan lama
+(yang sudah Anda ubah lewat Admin tidak ditimpa). Slug URL lama (`#/admin/aturan`, `#/admin/tim`, dst.) tetap dikenali.
+
 ## Tes
-`npm test` menjalankan tes domain di `tests/` (routing dan akses per peran, validasi admin, perhitungan laporan). Tes ini juga dijalankan di CI sebelum deploy.
+`npm test` menjalankan tes domain di `tests/` (routing dan akses per peran, validasi admin, perhitungan laporan, migrasi data lama, struktur tab admin, dan konsistensi istilah UI). Tes ini juga dijalankan di CI sebelum deploy.
 
 ## Arsitektur
 domain (entity + usecase, JS murni) <- data (repository) <- app (DI + context) <- presentation (React class)

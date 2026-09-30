@@ -43,7 +43,7 @@ export const kpis = (list, now) => {
   };
 };
 
-const AGING = [['< 1 jam', 60], ['1–4 jam', 240], ['4–24 jam', 1440], ['1–3 hari', 4320], ['> 3 hari', Infinity]];
+const AGING = [['< 1 hr', 60], ['1–4 hr', 240], ['4–24 hr', 1440], ['1–3 days', 4320], ['> 3 days', Infinity]];
 
 // tickets: seluruh tiket. f: { user, from, to, department, locationId, categoryId, priority, type } (nilai 'all' = tanpa filter).
 // ctx: { now, locationIds(namaLokasi) -> id lokasi dari spesifik ke akar, names: { department(id), category(id), sub(kategori, sub) } }
@@ -95,8 +95,8 @@ export function buildReport(tickets, f, ctx) {
       type: group(cohort, (t) => t.type, (k) => REQUEST_TYPES[k].label).sort(order(Object.keys(REQUEST_TYPES))),
       location: group(cohort, (t) => t.branch, (k) => k || '-').sort(byCount),
     },
-    teams: group(cohort, (t) => (t.routing ? t.routing.team : ''), (k) => k || 'Tanpa rute').sort(byCount),
-    pics: group(cohort, (t) => t.assignee || '', (k) => k || 'Belum diambil').sort(byCount),
+    teams: group(cohort, (t) => (t.routing ? t.routing.team : ''), (k) => k || 'No route').sort(byCount),
+    pics: group(cohort, (t) => t.assignee || '', (k) => k || 'Unassigned').sort(byCount),
     aging: AGING.map(([label, max], i) => {
       const min = i ? AGING[i - 1][1] : 0;
       const l = open.filter((t) => t.ageMin(now) >= min && t.ageMin(now) < max);
@@ -110,8 +110,8 @@ export function buildReport(tickets, f, ctx) {
 }
 
 // ---- Ekspor ----
-export const EXPORT_HEADER = ['ID', 'Dibuat (WIB)', 'Jenis', 'Prioritas', 'Kategori', 'Subkategori', 'Lokasi', 'Area', 'Department', 'Tim', 'PIC', 'Status', 'Respons (menit)', 'Penyelesaian (menit)', 'Target SLA (menit)', 'SLA terlewat', 'Pelapor'];
-const STATUS_TEXT = { open: 'Baru', in_progress: 'Sedang ditangani', done: 'Selesai' };
+export const EXPORT_HEADER = ['ID', 'Dibuat (WIB)', 'Type', 'Priority', 'Kategori', 'Subkategori', 'Lokasi', 'Area', 'Department', 'Team', 'PIC', 'Status', 'Response (min)', 'Resolution (min)', 'SLA target (min)', 'SLA breached', 'Reporter'];
+const STATUS_TEXT = { open: 'Open', in_progress: 'In Progress', done: 'Resolved' };
 const round1 = (m) => (m === null ? '' : Math.round(m * 10) / 10);
 export const exportRows = (tickets, ctx) => [EXPORT_HEADER, ...tickets.map((t) => [
   t.id, formatStamp(t.createdAt), REQUEST_TYPES[t.type].label, t.priority, ctx.names.category(t.categoryId), t.subId ? ctx.names.sub(t.categoryId, t.subId) : '',

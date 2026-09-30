@@ -22,7 +22,7 @@ class QuestionEditor extends AdminTab {
     const { rows, dirty, error } = this.state;
     return (
       <div>
-        <p className="text-sm text-slate-600">Pertanyaan ini muncul di formulir setelah pengguna memilih subkategori ini. Jawaban tampil di detail tiket.</p>
+        <p className="text-sm text-slate-600">Pertanyaan ini muncul di formulir setelah user memilih subkategori ini. Jawaban tampil di detail tiket.</p>
         <ul className="mt-4 space-y-3">
           {rows.map((r, i) => (
             <li key={r.uid} className="rounded-xl border border-slate-200 p-3">
@@ -32,10 +32,10 @@ class QuestionEditor extends AdminTab {
               </div>
               {r.type === 'select' && <Field className="mt-3" label="Pilihan jawaban" htmlFor={`qo-${r.uid}`} hint="Pisahkan dengan koma. Minimal 2 pilihan."><input id={`qo-${r.uid}`} className={`${inputCls} mt-1`} value={r.optionsText} onChange={(e) => this.patch(r.uid, { optionsText: e.target.value })} placeholder="Ringan, Berat, Darurat" /></Field>}
               <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                <label className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" checked={r.required} onChange={(e) => this.patch(r.uid, { required: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />Wajib dijawab</label>
+                <label className="flex items-center gap-2 text-sm text-slate-800"><input type="checkbox" checked={r.required} onChange={(e) => this.patch(r.uid, { required: e.target.checked })} className="h-4 w-4 accent-[var(--brand)]" />Required</label>
                 <span className="flex items-center gap-0.5">
-                  <button type="button" disabled={i === 0} onClick={() => this.move(i, -1)} aria-label={`Naikkan pertanyaan ${i + 1}`} className={`${btnSmall} !px-2 text-slate-700 hover:bg-slate-100`}><ArrowUp className="h-4 w-4" aria-hidden="true" /></button>
-                  <button type="button" disabled={i === rows.length - 1} onClick={() => this.move(i, 1)} aria-label={`Turunkan pertanyaan ${i + 1}`} className={`${btnSmall} !px-2 text-slate-700 hover:bg-slate-100`}><ArrowDown className="h-4 w-4" aria-hidden="true" /></button>
+                  <button type="button" disabled={i === 0} onClick={() => this.move(i, -1)} aria-label={`Move up pertanyaan ${i + 1}`} className={`${btnSmall} !px-2 text-slate-700 hover:bg-slate-100`}><ArrowUp className="h-4 w-4" aria-hidden="true" /></button>
+                  <button type="button" disabled={i === rows.length - 1} onClick={() => this.move(i, 1)} aria-label={`Move down pertanyaan ${i + 1}`} className={`${btnSmall} !px-2 text-slate-700 hover:bg-slate-100`}><ArrowDown className="h-4 w-4" aria-hidden="true" /></button>
                   <button type="button" onClick={() => this.remove(r.uid)} aria-label={`Hapus pertanyaan ${i + 1}`} className={`${btnSmall} !px-2 text-red-700 hover:bg-red-50`}><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
                 </span>
               </div>
@@ -70,7 +70,7 @@ export default class AdminCatalog extends AdminTab {
     const sub = subs.find((s) => s.id === subId) || null;
     const item = (active) => `flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm ${active ? 'bg-emerald-50 font-semibold text-[var(--brand)]' : 'text-slate-700 hover:bg-slate-50'}`;
     return (
-      <div className="grid items-start gap-5 lg:grid-cols-[250px_270px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[250px_270px_minmax(0,1fr)]">
         <section className="rounded-2xl border border-slate-200 bg-white p-3" aria-label="Kategori">
           <h2 className="px-3 pb-2 pt-1 text-sm font-semibold text-slate-950">Kategori</h2>
           <ul>{cats.map((c) => <li key={c.id}><button type="button" onClick={() => this.pickCat(c.id)} className={item(catId === c.id)}><span className="min-w-0 truncate">{c.name}</span><span className="text-xs font-normal text-slate-500">{usage[c.id] || 0} tiket</span></button></li>)}</ul>
@@ -93,7 +93,7 @@ export default class AdminCatalog extends AdminTab {
           {!cat && <p className="px-3 pb-3 text-sm text-slate-500">Pilih kategori lebih dulu.</p>}
           {cat && <>
             <ul>{subs.map((s) => <li key={s.id}><button type="button" onClick={() => this.pickSub(s.id)} className={item(subId === s.id)}><span className="min-w-0 truncate">{s.name}</span><span className="text-xs font-normal text-slate-500">{s.questions.length} pertanyaan</span></button></li>)}
-              {!subs.length && <li className="px-3 py-2 text-sm text-slate-500">Belum ada subkategori. Tiket kategori ini langsung dirutekan tanpa subkategori.</li>}</ul>
+              {!subs.length && <li className="px-3 py-2 text-sm text-slate-500">Belum ada subkategori. Tiket kategori ini langsung di-route tanpa subkategori.</li>}</ul>
             <form onSubmit={(e) => { e.preventDefault(); if (this.act(() => this.admin.addSub(cat.id, newSub), 'Subkategori ditambahkan.')) this.setState({ newSub: '' }); }} className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               <label className="sr-only" htmlFor="new-sub">Subkategori baru</label>
               <input id="new-sub" className={`${inputCls} !min-h-[40px]`} value={newSub} onChange={(e) => this.setState({ newSub: e.target.value, error: '' })} placeholder="Subkategori baru" />
@@ -110,7 +110,7 @@ export default class AdminCatalog extends AdminTab {
           <ErrorNote error={error} />
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Pertanyaan dinamis">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-label="Dynamic questions">
           <h2 className="font-semibold text-slate-950">Pertanyaan{sub ? ` · ${sub.name}` : ''}</h2>
           {!sub && <p className="mt-2 text-sm text-slate-500">Pilih subkategori untuk mengatur pertanyaan tambahannya.</p>}
           {sub && <QuestionEditor key={`${cat.id}/${sub.id}`} catId={cat.id} sub={sub} />}

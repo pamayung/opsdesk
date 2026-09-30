@@ -36,7 +36,7 @@ export default class QuickIncidentPage extends React.Component {
     const { container, user, notify, goTo } = this.context;
     const s = this.state;
     // Pelapor otomatis pengguna yang login; isi manual hanya bila melapor atas nama orang lain.
-    if (s.onBehalf && !s.reporter.trim()) { this.setState({ error: 'Isi nama pelapor.' }); return; }
+    if (s.onBehalf && !s.reporter.trim()) { this.setState({ error: 'Isi nama reporter.' }); return; }
     try {
       const r = container.createTicket.execute({
         type: s.type, priority: s.priority, locationName: this.locText(), newLocationParentId: s.newLocParent, area: s.area,
@@ -44,7 +44,7 @@ export default class QuickIncidentPage extends React.Component {
         reporter: s.onBehalf ? s.reporter : user.name, reporterRole: s.onBehalf ? s.reporterRole : user.title,
       });
       const extra = [r.isNewLocation && `lokasi baru "${r.location.name}"`, r.isNewCategory && `kategori baru "${r.category.name}"`].filter(Boolean);
-      notify(`Tiket ${r.ticket.id} dibuat dan dirutekan ke ${r.ticket.routing.team}${extra.length ? `. Tersimpan: ${extra.join(', ')}.` : '.'}`);
+      notify(`Tiket ${r.ticket.id} dibuat dan di-route ke ${r.ticket.routing.team}${extra.length ? `. Tersimpan: ${extra.join(', ')}.` : '.'}`);
       this.setState({ ...initial });
       goTo('detail', r.ticket.id);
     } catch (err) { this.setState({ error: err.message }); }
@@ -52,10 +52,10 @@ export default class QuickIncidentPage extends React.Component {
 
   renderQuestion(q) {
     const v = this.state.answers[q.id] || '';
-    const label = <label htmlFor={`q-${q.id}`} className="block text-sm font-medium">{q.label}{!q.required && <span className="font-normal text-slate-500"> (opsional)</span>}</label>;
+    const label = <label htmlFor={`q-${q.id}`} className="block text-sm font-medium">{q.label}{!q.required && <span className="font-normal text-slate-500"> (optional)</span>}</label>;
     if (q.type === 'yesno') {
       return (
-        <div key={q.id}><p className="text-sm font-medium">{q.label}{!q.required && <span className="font-normal text-slate-500"> (opsional)</span>}</p>
+        <div key={q.id}><p className="text-sm font-medium">{q.label}{!q.required && <span className="font-normal text-slate-500"> (optional)</span>}</p>
           <div className="mt-1 flex gap-2" role="group" aria-label={q.label}>
             {['Ya', 'Tidak'].map((o) => <button key={o} type="button" aria-pressed={v === o} onClick={() => this.setAnswer(q.id, v === o ? '' : o)} className={`min-h-[44px] min-w-[88px] rounded-xl border px-4 text-sm font-semibold ${v === o ? 'border-[var(--brand)] bg-emerald-50 text-[var(--brand)]' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>{o}</button>)}
           </div></div>
@@ -97,7 +97,7 @@ export default class QuickIncidentPage extends React.Component {
       categoryId: existingCat ? existingCat.id : typedCat ? '__baru' : null, subId: sub ? sub.id : undefined,
       type: s.type, kind, priority: s.priority, locationIds: chain.map((n) => n.id),
     });
-    const missing = [!s.priority && 'prioritas', !typedLoc ? 'lokasi' : (newLoc && !anchorId) && 'induk lokasi', !typedCat ? 'kategori' : subMissing && 'subkategori'].filter(Boolean);
+    const missing = [!s.priority && 'priority', !typedLoc ? 'lokasi' : (newLoc && !anchorId) && 'induk lokasi', !typedCat ? 'kategori' : subMissing && 'subkategori'].filter(Boolean);
     const unanswered = sub ? sub.questions.some((q) => q.required && !String(s.answers[q.id] || '').trim()) : false;
     const ready = s.priority && typedLoc && anchorId && typedCat && !subMissing && !unanswered && s.title.trim().length >= 5 && !s.busy;
     const roots = nodes.filter((n) => !n.parentId);
@@ -106,13 +106,13 @@ export default class QuickIncidentPage extends React.Component {
 
     return <div className="mx-auto max-w-6xl space-y-5">
       <header>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Buat Tiket</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Report Issue</h1>
         <p className="mt-1 text-sm text-slate-600">Isi yang penting dulu. Detail dan foto bisa ditambahkan nanti lewat catatan.</p>
       </header>
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4">
           <Card>
-            <div className="flex items-center justify-between"><h2 className="font-semibold">1. Jenis kebutuhan</h2><span className="text-xs text-slate-500">Wajib</span></div>
+            <div className="flex items-center justify-between"><h2 className="font-semibold">1. Request type</h2><span className="text-xs text-slate-500">Required</span></div>
             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {Object.entries(REQUEST_TYPES).map(([k, v]) => (
                 <button key={k} type="button" aria-pressed={s.type === k} onClick={() => this.setState({ type: k, error: '' })} className={`rounded-xl border p-3 text-left ${s.type === k ? 'border-[var(--brand)] bg-emerald-50 ring-1 ring-[var(--brand)]' : 'border-slate-200 hover:bg-slate-50'}`}>
@@ -123,7 +123,7 @@ export default class QuickIncidentPage extends React.Component {
           </Card>
 
           <Card>
-            <div className="flex items-center justify-between"><h2 className="font-semibold">2. Seberapa mendesak?</h2><span className="text-xs text-slate-500">Wajib</span></div>
+            <div className="flex items-center justify-between"><h2 className="font-semibold">2. Priority</h2><span className="text-xs text-slate-500">Required</span></div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               {Object.entries(PRIORITIES).map(([k, v]) => (
                 <button key={k} type="button" aria-pressed={s.priority === k} onClick={() => this.setState({ priority: k, error: '' })} className={`rounded-xl border p-3 text-left ${s.priority === k ? 'border-[var(--brand)] ring-1 ring-[var(--brand)]' : 'border-slate-200 hover:border-slate-300'}`}>
@@ -135,7 +135,7 @@ export default class QuickIncidentPage extends React.Component {
           </Card>
 
           <Card>
-            <div className="flex items-center justify-between"><h2 className="font-semibold">3. Di mana?</h2><span className="text-xs text-slate-500">Wajib</span></div>
+            <div className="flex items-center justify-between"><h2 className="font-semibold">3. Di mana?</h2><span className="text-xs text-slate-500">Required</span></div>
             <label htmlFor="location" className="mt-4 block text-sm font-medium">Lokasi</label>
             <input id="location" value={this.locText()} onChange={this.set('locationText')} placeholder="Ketik lokasi atau pilih di bawah" className={input} />
             <div className="mt-3 space-y-3">
@@ -167,16 +167,16 @@ export default class QuickIncidentPage extends React.Component {
                   </select>
                   <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
                 </div>
-                <p className="mt-1.5 text-xs text-slate-500">Lokasi akan disimpan dan mengikuti jenis serta cakupan area induknya.</p>
+                <p className="mt-1.5 text-xs text-slate-500">Lokasi akan disimpan dan mengikuti jenis serta area scope induknya.</p>
               </div>
             )}
-            <label htmlFor="area" className="mt-4 block text-sm font-medium">Area / ruangan <span className="font-normal text-slate-500">(opsional)</span></label>
+            <label htmlFor="area" className="mt-4 block text-sm font-medium">Area / ruangan <span className="font-normal text-slate-500">(optional)</span></label>
             <input id="area" list="areas" value={s.area} onChange={this.set('area')} placeholder="Contoh: area kasir depan, lantai 3" className={input} />
             <datalist id="areas">{container.listAreas.execute(typedLoc).map((a) => <option key={a} value={a} />)}</datalist>
           </Card>
 
           <Card>
-            <div className="flex items-center justify-between"><h2 className="font-semibold">4. Apa masalahnya?</h2><span className="text-xs text-slate-500">Wajib</span></div>
+            <div className="flex items-center justify-between"><h2 className="font-semibold">4. Apa masalahnya?</h2><span className="text-xs text-slate-500">Required</span></div>
             <label htmlFor="category" className="mt-4 block text-sm font-medium">Kategori</label>
             <input id="category" value={s.categoryText} onChange={(e) => this.setState({ categoryText: e.target.value, subId: '', answers: {}, error: '' })} placeholder="Ketik atau pilih di bawah" className={input} />
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -198,46 +198,46 @@ export default class QuickIncidentPage extends React.Component {
             )}
             {sub && sub.questions.length > 0 && (
               <div className="mt-4 space-y-4 rounded-xl bg-slate-50 p-4">
-                <p className="text-sm font-semibold text-slate-700">Informasi tambahan untuk {sub.name}</p>
+                <p className="text-sm font-semibold text-slate-700">Additional questions for {sub.name}</p>
                 {sub.questions.map((q) => this.renderQuestion(q))}
               </div>
             )}
 
             <label htmlFor="title" className="mt-5 block text-sm font-medium">Judul singkat</label>
             <input id="title" value={s.title} maxLength={80} onChange={this.set('title')} placeholder="Contoh: Mesin kasir mati total saat jam ramai" className={input} />
-            <label htmlFor="description" className="mt-4 block text-sm font-medium">Detail <span className="font-normal text-slate-500">(opsional)</span></label>
+            <label htmlFor="description" className="mt-4 block text-sm font-medium">Detail <span className="font-normal text-slate-500">(optional)</span></label>
             <textarea id="description" rows={4} value={s.description} maxLength={500} onChange={this.set('description')} placeholder="Apa yang terjadi? Siapa atau apa yang terdampak? Sejak kapan?" className="mt-1 w-full rounded-xl border border-slate-200 p-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]" />
             <div className="text-right text-xs text-slate-500">{s.description.length}/500</div>
 
             <div className="mt-3 border-t border-slate-100 pt-3">
               {!s.onBehalf ? (
-                <p className="flex flex-wrap items-center gap-x-2 text-sm text-slate-600">Pelapor: <span className="font-semibold text-slate-900">{user.name} ({user.title})</span>
-                  <button type="button" onClick={() => this.setState({ onBehalf: true })} className="rounded font-semibold text-[var(--brand)] hover:underline">Lapor atas nama orang lain</button></p>
+                <p className="flex flex-wrap items-center gap-x-2 text-sm text-slate-600">Reporter: <span className="font-semibold text-slate-900">{user.name} ({user.title})</span>
+                  <button type="button" onClick={() => this.setState({ onBehalf: true })} className="rounded font-semibold text-[var(--brand)] hover:underline">Report on behalf of someone else</button></p>
               ) : (
                 <div>
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div><label htmlFor="reporter" className="block text-sm font-medium">Nama pelapor</label><input id="reporter" value={s.reporter} onChange={this.set('reporter')} placeholder="Nama orang yang melapor" className={input} /></div>
-                    <div><label htmlFor="role" className="block text-sm font-medium">Peran <span className="font-normal text-slate-500">(opsional)</span></label><input id="role" list="roles" value={s.reporterRole} onChange={this.set('reporterRole')} placeholder="Contoh: Kasir" className={input} /><datalist id="roles">{container.reporterRoles.map((r) => <option key={r} value={r} />)}</datalist></div>
+                    <div><label htmlFor="reporter" className="block text-sm font-medium">Nama reporter</label><input id="reporter" value={s.reporter} onChange={this.set('reporter')} placeholder="Nama orang yang melapor" className={input} /></div>
+                    <div><label htmlFor="role" className="block text-sm font-medium">Role <span className="font-normal text-slate-500">(optional)</span></label><input id="role" list="roles" value={s.reporterRole} onChange={this.set('reporterRole')} placeholder="Contoh: Kasir" className={input} /><datalist id="roles">{container.reporterRoles.map((r) => <option key={r} value={r} />)}</datalist></div>
                   </div>
-                  <button type="button" onClick={() => this.setState({ onBehalf: false, reporter: '', reporterRole: '', error: '' })} className="mt-2 rounded text-sm font-semibold text-[var(--brand)] hover:underline">Kembali ke saya ({user.name})</button>
+                  <button type="button" onClick={() => this.setState({ onBehalf: false, reporter: '', reporterRole: '', error: '' })} className="mt-2 rounded text-sm font-semibold text-[var(--brand)] hover:underline">Back to me ({user.name})</button>
                 </div>
               )}
             </div>
           </Card>
 
           <Card>
-            <h2 className="font-semibold">5. Foto / bukti</h2>
+            <h2 className="font-semibold">5. Photo / evidence</h2>
             <label className="mt-3 grid min-h-[120px] cursor-pointer place-items-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 text-center has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-[var(--brand)]">
               {s.photo
-                ? <div><img src={s.photo} alt="Pratinjau foto" className="mx-auto max-h-36 rounded-lg" /><p className="mt-2 text-xs text-slate-500">Klik untuk mengganti foto</p></div>
-                : <div><Paperclip className="mx-auto h-6 w-6 text-slate-400" aria-hidden="true" /><p className="mt-1 text-sm font-medium">{s.busy ? 'Memproses foto…' : 'Ambil atau unggah foto kondisi'}</p><p className="text-xs text-slate-500">Opsional · JPG atau PNG</p></div>}
+                ? <div><img src={s.photo} alt="Preview foto" className="mx-auto max-h-36 rounded-lg" /><p className="mt-2 text-xs text-slate-500">Klik untuk mengganti foto</p></div>
+                : <div><Paperclip className="mx-auto h-6 w-6 text-slate-400" aria-hidden="true" /><p className="mt-1 text-sm font-medium">{s.busy ? 'Memproses foto…' : 'Ambil atau upload foto kondisi'}</p><p className="text-xs text-slate-500">Optional · JPG atau PNG</p></div>}
               <input type="file" accept="image/*" capture="environment" className="sr-only" onChange={this.onPhoto} />
             </label>
           </Card>
 
           {s.error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{s.error}</p>}
           <div className="flex gap-2">
-            <Button className="flex-1" disabled={!ready} onClick={this.submit}>Kirim Tiket</Button>
+            <Button className="flex-1" disabled={!ready} onClick={this.submit}>Submit Ticket</Button>
             <Button variant="ghost" onClick={() => this.setState({ ...initial })}>Reset</Button>
           </div>
         </div>
@@ -247,32 +247,32 @@ export default class QuickIncidentPage extends React.Component {
             <h2 className="text-lg font-semibold">Routing preview</h2>
             <p className="mt-1 text-sm text-slate-600">Ke mana tiket ini akan pergi setelah dikirim.</p>
             {!route ? (
-              <p className="mt-4 rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">Pilih {missing.join(', ')} untuk melihat rutenya.</p>
+              <p className="mt-4 rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">Pilih {missing.join(', ')} untuk melihat route-nya.</p>
             ) : (
               <div className="mt-4 space-y-2 text-sm">
                 <div className="rounded-xl bg-slate-50 p-3">
-                  <p className="text-xs text-slate-500">Lokasi &amp; klasifikasi</p>
+                  <p className="text-xs text-slate-500">Lokasi &amp; classification</p>
                   <p className="mt-1 font-semibold">{typedLoc}<span className="font-normal text-slate-500"> · {LOCATION_KINDS[kind].label}</span></p>
                   <p className="text-slate-700">{typedCat}{sub ? ` › ${sub.name}` : ''}</p>
                 </div>
                 <div className="flex justify-center text-slate-400"><ArrowDown className="h-4 w-4" aria-hidden="true" /></div>
                 <div className="rounded-xl bg-emerald-50 p-3"><p className="text-xs text-emerald-700">Department</p><p className="mt-1 font-semibold text-emerald-900">{container.departments[route.department].name}</p></div>
                 <div className="rounded-xl bg-emerald-50 p-3">
-                  <p className="text-xs text-emerald-700">Tim{route.external ? ' (vendor)' : ''}</p><p className="mt-1 font-semibold text-emerald-900">{route.team}</p>
-                  {route.offHours && <p className="mt-1.5 flex items-start gap-1.5 text-xs text-amber-800"><Moon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />Di luar jam kerja tim utama, dialihkan ke on-call.</p>}
+                  <p className="text-xs text-emerald-700">Team{route.external ? ' (vendor)' : ''}</p><p className="mt-1 font-semibold text-emerald-900">{route.team}</p>
+                  {route.offHours && <p className="mt-1.5 flex items-start gap-1.5 text-xs text-amber-800"><Moon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />Di luar working hours main team, dialihkan ke on-call.</p>}
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
-                  <p className="text-xs text-slate-500">{route.pic && route.pic.byArea ? 'PIC area' : 'PIC awal'}</p>
+                  <p className="text-xs text-slate-500">{route.pic && route.pic.byArea ? 'PIC area' : 'Initial PIC'}</p>
                   {route.pic
                     ? <p className="mt-1 font-semibold">{route.pic.name}<span className="ml-1.5 text-xs font-normal text-slate-500">{route.pic.load} tiket aktif</span></p>
-                    : <p className="mt-1 text-slate-700">Belum ada anggota yang tersedia. Diteruskan ke ketua tim <span className="font-semibold">{route.escalation.l1}</span>.</p>}
+                    : <p className="mt-1 text-slate-700">Belum ada member yang available. Diteruskan ke team lead <span className="font-semibold">{route.escalation.l1}</span>.</p>}
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
                   <p className="flex items-center gap-1.5 text-xs text-slate-500"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" />SLA</p>
-                  <p className="mt-1 font-semibold">Respons &lt; {p.respondText} · Selesai &lt; {p.slaText}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-slate-500">{route.escalation.l1 === route.escalation.l2 ? `Eskalasi otomatis ke ${route.escalation.l1} bila belum direspons atau saat sisa SLA di bawah 25%.` : `Eskalasi otomatis: L1 ke ${route.escalation.l1} bila belum direspons, L2 ke ${route.escalation.l2} saat sisa SLA di bawah 25%.`}</p>
+                  <p className="mt-1 font-semibold">Response &lt; {p.respondText} · Resolution &lt; {p.slaText}</p>
+                  <p className="mt-1.5 text-xs leading-5 text-slate-500">{route.escalation.l1 === route.escalation.l2 ? `Auto-escalation ke ${route.escalation.l1} bila belum di-respond atau saat sisa SLA di bawah 25%.` : `Auto-escalation: L1 ke ${route.escalation.l1} bila belum di-respond, L2 ke ${route.escalation.l2} saat sisa SLA di bawah 25%.`}</p>
                 </div>
-                <p className="px-1 text-xs text-slate-400">Aturan: {route.ruleId}</p>
+                <p className="px-1 text-xs text-slate-400">Rule: {route.ruleId}</p>
               </div>
             )}
           </Card>

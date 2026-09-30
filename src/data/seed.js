@@ -46,7 +46,7 @@ const RESOLUTIONS = ['Sudah diperbaiki dan dites.', 'Komponen diganti, berfungsi
 // route(input, waktu) = mesin routing; locInfo(namaLokasi) = { kind, ids } dari pohon lokasi.
 function makeSeed(route, locInfo, now) {
   const ago = (m) => now - m * min;
-  const created = (at) => systemNote('Tiket dibuat dan masuk antrean', at);
+  const created = (at) => systemNote('Ticket created and added to the queue', at);
   const reporterNote = (author, role, text, at, image = null) => makeNote({ party: 'reporter', author, role, text, image, at });
 
   // Membuat tiket contoh: rute dihitung dengan mesin yang sama seperti tiket asli.
@@ -63,13 +63,13 @@ function makeSeed(route, locInfo, now) {
     const notes = o.notes || [created(createdAt), routingNote(routing, createdAt)];
     if (!o.notes) {
       if (description) notes.push(reporterNote(reporter, reporterRole, description, createdAt + min));
-      if (assignee) notes.push(systemNote(`Tiket diambil oleh ${assignee}`, respondedAt));
+      if (assignee) notes.push(systemNote(`Ticket taken by ${assignee}`, respondedAt));
     }
     let resolution = null;
     if (status === 'done') {
       const closedAt = createdAt + o.closeAfter * min;
       resolution = { note: o.resolutionNote, closedBy: assignee, closedAt };
-      if (!o.notes) notes.push(makeNote({ party: 'tech', author: assignee, role: 'PIC', text: `Penyelesaian: ${o.resolutionNote}`, at: closedAt }), systemNote(`Tiket diselesaikan oleh ${assignee}`, closedAt));
+      if (!o.notes) notes.push(makeNote({ party: 'tech', author: assignee, role: 'PIC', text: `Resolution: ${o.resolutionNote}`, at: closedAt }), systemNote(`Ticket resolved by ${assignee}`, closedAt));
     }
     return new Ticket({
       id: o.id || `TCK-${1040 + i}`, type, priority, categoryId, subId, branch, location, title, description, reporter, reporterRole,
@@ -84,7 +84,7 @@ function makeSeed(route, locInfo, now) {
       notes: [
         created(ago(16)), routingNote(route({ categoryId: 'it', subId: 'pos', type: 'incident', priority: 'P1', kind: 'outlet', locationIds: locInfo('Senopati').ids }, OFFICE_TIME), ago(16)),
         reporterNote('Rina', 'Kasir', 'Adaptor cadangan yang di lemari kasir sudah dicoba colok tetap tidak menyala lampu indikatornya. Sekarang orderan meja 14–18 dialihkan sementara ke POS 2 (Minuman).', ago(15), POS_PHOTO),
-        systemNote('Tiket diambil oleh Kevin Mahendra', ago(12)),
+        systemNote('Ticket taken by Kevin Mahendra', ago(12)),
         makeNote({ party: 'helpdesk', author: 'Niko', role: 'IT Helpdesk', text: 'Log Cloud POS menunjukkan terminal disconnect mendadak tanpa error sinkronisasi. Bawa 1 unit PSU dock cadangan seri EPSON TM-T82 & mainboard touch kit.', at: ago(11) }),
         makeNote({ party: 'tech', author: 'Kevin Mahendra', role: 'IT Support Area', text: 'Sudah di jalan ke Senopati, estimasi tiba 4 menit. Masuk lewat pintu loading bay langsung ke meja kasir 1.', at: ago(7) }),
       ],

@@ -17,17 +17,20 @@ Karyawan, PIC, Manajer Department, dan Manajemen memiliki dashboard, menu, dan c
 Tombol aksi (ambil, tugaskan, selesaikan, eskalasi) hanya untuk PIC dan manajer department.
 
 ## Detail tiket
-Klasifikasi dan jawaban pertanyaan, jalur lokasi, Penanganan (department, tim, PIC), catatan & riwayat dengan foto, selesaikan tiket, eskalasi vendor, waktu respons.
+Klasifikasi dan jawaban pertanyaan, jalur lokasi, Assignment (department, tim, PIC), catatan & riwayat dengan foto, selesaikan tiket, eskalasi vendor, waktu respons.
 
 ## Laporan
 Halaman `#/laporan` untuk semua peran (data mengikuti hak akses): periode + filter, enam KPI dengan perbandingan periode sebelumnya, tren, rincian per department/kategori/lokasi/prioritas/jenis,
 umur tiket terbuka, kinerja tim dan PIC, tiket terlewat SLA, unduh CSV yang aman untuk Excel, dan tata letak cetak/PDF. Riwayat contoh 60 hari tersedia untuk demo.
 
 ## Halaman Admin
-Khusus peran Administrator (menu Admin; URL langsung ditolak untuk peran lain). Lima tab: Lokasi, Department & Tim, Aturan Routing, Kategori & Pertanyaan, Pengguna & Peran.
+Khusus peran Administrator (menu Admin; URL langsung ditolak untuk peran lain). Lima tab: Lokasi, Departments & Teams, Routing Rules, Kategori & Pertanyaan, Users & Roles.
 - Perubahan langsung berlaku di routing, form, dan dashboard. Validasi mencegah data rusak (mis. tim yang masih dipakai aturan tidak bisa dihapus, pesannya menjelaskan alasannya).
-- Aturan routing: urutkan naik/turun, peringatan aturan yang tak akan pernah dipakai, dan panel **Uji routing** (termasuk simulasi hari & jam).
-- Hapus memakai konfirmasi dua langkah. "Kembalikan ke bawaan" tersedia untuk konfigurasi organisasi.
+- Aturan routing: urutkan naik/turun, peringatan aturan yang tak akan pernah dipakai, dan panel **Test routing** (termasuk simulasi hari & jam).
+- Hapus memakai konfirmasi dua langkah. "Reset to default" tersedia untuk konfigurasi organisasi.
+
+## Istilah
+Istilah domain memakai English (Open, In Progress, Resolved, Critical, SLA breached, My Queue, Needs attention, Escalate, Assignment, dst.); kata sehari-hari tetap Indonesian. Daftar lengkap ada di README (bagian "Istilah di UI").
 
 ## Sebelumnya
 - Service Catalog dan dropdown lokasi di header dihapus.

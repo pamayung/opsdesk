@@ -21,7 +21,7 @@ export class StatusBadge extends React.PureComponent {
 export class SlaTimer extends React.PureComponent {
   render() {
     const { ticket, now } = this.props;
-    if (ticket.status === 'done') return <span className="text-xs font-medium text-emerald-700">Selesai</span>;
+    if (ticket.status === 'done') return <span className="text-xs font-medium text-emerald-700">Resolved</span>;
     const level = ticket.slaLevel(now);
     return (
       <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold tabular-nums ${SLA_LEVELS[level].chip}`}>

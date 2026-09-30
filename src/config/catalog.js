@@ -17,13 +17,13 @@ export const SUBCATEGORIES = {
     ] },
     { id: 'enduser', name: 'Perangkat pengguna (laptop, printer)', questions: [
       { id: 'device', label: 'Jenis perangkat', type: 'select', options: ['Laptop', 'Desktop', 'Printer', 'Lainnya'], required: true },
-      { id: 'asset', label: 'Nomor aset', type: 'text', placeholder: 'Opsional' },
+      { id: 'asset', label: 'Nomor aset', type: 'text', placeholder: 'Optional' },
       { id: 'symptom', label: 'Apa yang terjadi?', type: 'text', required: true },
     ] },
     { id: 'bizapp', name: 'Aplikasi bisnis (SAP dll.)', questions: [
       { id: 'app', label: 'Aplikasi', type: 'select', options: ['SAP', 'Aplikasi HR', 'Aplikasi Finance', 'Lainnya'], required: true },
       { id: 'need', label: 'Akses atau modul yang dibutuhkan', type: 'text', required: true },
-      { id: 'error', label: 'Pesan error', type: 'text', placeholder: 'Opsional' },
+      { id: 'error', label: 'Pesan error', type: 'text', placeholder: 'Optional' },
     ] },
     { id: 'wms', name: 'Sistem gudang (WMS)', questions: [
       { id: 'halt', label: 'Operasional gudang berhenti?', type: 'yesno', required: true },
@@ -41,7 +41,7 @@ export const SUBCATEGORIES = {
     ] },
   ],
   utilitas: [
-    { id: 'ac', name: 'AC & pendingin', questions: [
+    { id: 'ac', name: 'AC & cooling', questions: [
       { id: 'units', label: 'Jumlah unit', type: 'number' },
       { id: 'issue', label: 'Masalah', type: 'select', options: ['Tidak dingin', 'Bocor', 'Bunyi berisik', 'Mati total'], required: true },
     ] },
@@ -63,14 +63,14 @@ export const SUBCATEGORIES = {
     ] },
   ],
   stok: [
-    { id: 'stok', name: 'Stok & persediaan', questions: [
+    { id: 'stok', name: 'Stock & inventory', questions: [
       { id: 'item', label: 'Nama barang', type: 'text', required: true },
       { id: 'left', label: 'Sisa stok', type: 'text', placeholder: 'Contoh: 2 sleeve' },
     ] },
   ],
   keamanan: [
     { id: 'akses', name: 'CCTV, kunci & akses', questions: [] },
-    { id: 'insiden', name: 'Insiden keamanan', questions: [
+    { id: 'insiden', name: 'Security incident', questions: [
       { id: 'danger', label: 'Ada bahaya bagi orang?', type: 'yesno', required: true },
     ] },
   ],
