@@ -4,8 +4,38 @@
     npm install
     npm run dev
 
+    npm test          # tes domain: routing, admin, laporan
+    npm run build     # hasil di dist/
+
 Proyek sudah lengkap (Vite + React 18 + Tailwind 3.4 terkunci + lucide-react untuk ikon). Jangan upgrade ke Tailwind v4
 tanpa migrasi (v4 tidak memakai `@tailwind base;` dan `tailwind.config.js` seperti di sini).
+
+## Deploy ke GitHub Pages
+Sudah disiapkan: `.github/workflows/deploy.yml` menjalankan `npm ci`, `npm test`, `npm run build`, lalu mempublikasikan `dist/` ke GitHub Pages.
+Pull request hanya menjalankan tes dan build (tanpa deploy).
+
+1. Buat repository di GitHub (kosong, tanpa README), lalu dari folder proyek:
+
+       git add -A
+       git commit -m "OpsDesk"
+       git branch -M main
+       git remote add origin https://github.com/<user>/<repo>.git
+       git push -u origin main
+
+2. Di GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions** (satu kali saja).
+3. Buka tab **Actions**; setelah workflow "CI & Deploy" hijau, situs ada di `https://<user>.github.io/<repo>/`.
+   Push berikutnya ke `main` otomatis memperbarui situs.
+
+Catatan:
+- `vite.config.js` memakai `base: './'` (path relatif), jadi tidak perlu mengubah apa pun untuk nama repo berbeda atau domain kustom
+  (Settings → Pages → Custom domain). Routing memakai hash (`#/tiket/...`), jadi tautan langsung dan reload tetap bekerja tanpa konfigurasi server.
+- GitHub Pages gratis untuk repository publik; untuk repository privat perlu paket berbayar GitHub.
+- **Ini aplikasi demo sisi klien.** Data (tiket, konfigurasi admin, pengguna aktif) tersimpan di `localStorage` browser masing-masing pengunjung dan
+  pemilih pengguna di menu profil memungkinkan siapa pun berganti ke peran Administrator. Jangan memasukkan data sungguhan di situs publik;
+  untuk pemakaian nyata perlu backend dengan login (lihat "Yang belum ada").
+- `localStorage` dibagi per *origin* (`<user>.github.io`), bukan per repo. Dua proyek dari akun yang sama di `github.io` akan berbagi kunci `opsdesk:*`.
+  Pakai domain kustom atau bersihkan data situs bila bertabrakan.
+- Font dimuat dari Google Fonts; tanpa koneksi ke sana tampilan memakai font sistem.
 
 ## Lima layer
 Pengguna → **Jenis kebutuhan** → **Klasifikasi** → **Routing** → **Workflow**
@@ -97,6 +127,9 @@ Perubahan hanya berlaku untuk tiket baru; tiket yang sudah ada tidak dirutekan u
 - Pengaturan target SLA per prioritas belum bisa diubah dari Admin (masih di `src/domain/constants.js`).
 - Nama pengguna dan anggota tim tidak bisa diubah setelah dibuat (riwayat tiket menautkan lewat nama).
 - Status tiket: Baru → Sedang Ditangani → Selesai.
+
+## Tes
+`npm test` menjalankan tes domain di `tests/` (routing dan akses per peran, validasi admin, perhitungan laporan). Tes ini juga dijalankan di CI sebelum deploy.
 
 ## Arsitektur
 domain (entity + usecase, JS murni) <- data (repository) <- app (DI + context) <- presentation (React class)

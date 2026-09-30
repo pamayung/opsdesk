@@ -3,6 +3,9 @@ import { makeNote, systemNote, routingNote } from '../domain/Note';
 import { PRIORITIES } from '../domain/constants';
 
 const min = 60000;
+// Aset publik dirujuk relatif terhadap base aplikasi (bukan "/"), agar tetap termuat saat dihosting di subpath (mis. GitHub Pages).
+const BASE = (import.meta.env && import.meta.env.BASE_URL) || './';
+const POS_PHOTO = `${BASE}seed/pos-terminal.jpg`;
 // Rute tiket contoh dievaluasi pada jam kerja tetap (Rabu 10:00 WIB) agar demo selalu sama, apa pun jam bukanya.
 const OFFICE_TIME = Date.parse('2026-09-30T03:00:00Z');
 const pairs = (list) => list.map(([q, a]) => ({ q, a }));
@@ -80,7 +83,7 @@ function makeSeed(route, locInfo, now) {
       status: 'in_progress', assignee: 'Kevin Mahendra', answers: [['Nomor POS / terminal', 'POS 1'], ['Gejala', 'Mati total'], ['Transaksi masih bisa lewat POS lain?', 'Ya']],
       notes: [
         created(ago(16)), routingNote(route({ categoryId: 'it', subId: 'pos', type: 'incident', priority: 'P1', kind: 'outlet', locationIds: locInfo('Senopati').ids }, OFFICE_TIME), ago(16)),
-        reporterNote('Rina', 'Kasir', 'Adaptor cadangan yang di lemari kasir sudah dicoba colok tetap tidak menyala lampu indikatornya. Sekarang orderan meja 14–18 dialihkan sementara ke POS 2 (Minuman).', ago(15), '/seed/pos-terminal.jpg'),
+        reporterNote('Rina', 'Kasir', 'Adaptor cadangan yang di lemari kasir sudah dicoba colok tetap tidak menyala lampu indikatornya. Sekarang orderan meja 14–18 dialihkan sementara ke POS 2 (Minuman).', ago(15), POS_PHOTO),
         systemNote('Tiket diambil oleh Kevin Mahendra', ago(12)),
         makeNote({ party: 'helpdesk', author: 'Niko', role: 'IT Helpdesk', text: 'Log Cloud POS menunjukkan terminal disconnect mendadak tanpa error sinkronisasi. Bawa 1 unit PSU dock cadangan seri EPSON TM-T82 & mainboard touch kit.', at: ago(11) }),
         makeNote({ party: 'tech', author: 'Kevin Mahendra', role: 'IT Support Area', text: 'Sudah di jalan ke Senopati, estimasi tiba 4 menit. Masuk lewat pintu loading bay langsung ke meja kasir 1.', at: ago(7) }),
