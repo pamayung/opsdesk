@@ -4,11 +4,108 @@
     npm install
     npm run dev
 
-Proyek sudah lengkap (Vite + React 18 + Tailwind 3.4 terkunci). Jangan upgrade ke Tailwind v4 tanpa migrasi
-(v4 tidak memakai `@tailwind base;` dan `tailwind.config.js` seperti di sini).
+Proyek sudah lengkap (Vite + React 18 + Tailwind 3.4 terkunci + lucide-react untuk ikon). Jangan upgrade ke Tailwind v4
+tanpa migrasi (v4 tidak memakai `@tailwind base;` dan `tailwind.config.js` seperti di sini).
+
+## Lima layer
+Pengguna → **Jenis kebutuhan** → **Klasifikasi** → **Routing** → **Workflow**
+
+1. **Jenis kebutuhan**: Insiden, Permintaan, Keluhan, Pertanyaan.
+2. **Klasifikasi**: Kategori → Subkategori → pertanyaan dinamis (mis. POS: nomor terminal, gejala; Reimbursement: nominal).
+   Jawaban wajib divalidasi dan tampil di detail tiket. Definisi ada di `src/config/catalog.js`.
+3. **Routing**: Lokasi + Department + Aturan + Prioritas → Tim → PIC (`src/domain/Routing.js`, aturan di `src/config/routing.js`).
+4. **Workflow**: penugasan PIC → SLA (respons & penyelesaian) → eskalasi otomatis → penyelesaian.
+
+### Lokasi adalah parameter routing
+Struktur lokasi bertingkat (`src/config/org.js`): Head Office, Operations → Area → Outlet, Distribution Center → Warehouse / Fleet / Maintenance.
+Jenis lokasi (outlet / head_office / warehouse) diwarisi dari leluhur teratas, sehingga masalah yang sama bisa ke tim berbeda:
+
+| Masalah | Outlet | Head Office | DC |
+|---|---|---|---|
+| Internet bermasalah | IT Support Area | IT Helpdesk | IT Infrastructure |
+
+Anggota tim punya **cakupan area** (`scope`), sehingga PIC-nya pun berbeda: POS error di Senopati (Area 1) ke Kevin, di BSD (Area 2) ke Budi.
+Lokasi baru bisa ditambahkan saat membuat tiket (dipilih di bawah induk mana) dan mewarisi jenis serta cakupan area induknya.
+
+Aturan routing dicek dari atas ke bawah, yang pertama cocok menang. Kategori baru otomatis ke Service Desk (aturan `default`).
+Di luar jam kerja tim dialihkan ke tim on-call (department pemilik tiket tidak berubah). Tim boleh eksternal (vendor).
+Pratinjau di form dan tiket asli memakai mesin yang sama.
+
+### Peran dan dashboard
+Pengguna dan peran dikelola di halaman Admin (nilai awal di `src/config/users.js`). Pilih pengguna dari menu profil (demo) untuk melihat tiap peran.
+
+| Peran | Melihat | Dashboard |
+|---|---|---|
+| Karyawan | tiket yang ia laporkan | Terbuka / Sedang ditangani / Selesai |
+| PIC | tiket tim-nya atau yang ditugaskan | Kritis / Tinggi / Sedang / Rendah + antrean saya |
+| Manajer Department | semua tiket department-nya | Terbuka, SLA terlewat, Kritis, rata-rata penyelesaian, antrean per tim |
+| Manajemen | seluruh organisasi (hanya lihat) | Total, Terbuka, SLA terlewat, Selesai, tiket per department |
+| Administrator | seluruh organisasi (hanya lihat) + halaman Admin | Sama dengan Manajemen |
+
+Aturan akses ada di `src/domain/Access.js`. Hanya PIC dan manajer department yang bisa menugaskan, menyelesaikan, dan mengeskalasi tiket.
+Tiket di luar akses tidak bisa dibuka meski lewat tautan langsung.
+
+## Halaman
+| Rute | Halaman |
+|---|---|
+| `#/` | Dashboard sesuai peran |
+| `#/tiket` | Antrean (pencarian, status, kategori, perlu perhatian SLA, PIC, dan department untuk manajemen) |
+| `#/laporan` | Laporan (lihat bagian di bawah) |
+| `#/tiket/TCK-1042` | Detail: Penanganan (department, tim, PIC), catatan & riwayat, selesaikan tiket, waktu respons |
+| `#/buat` | Buat tiket dengan Routing Preview |
+
+Eskalasi SLA otomatis (dihitung dan ditandai): L1 bila belum direspons melewati target, L2 bila sisa SLA di bawah 25%.
+Pelapor otomatis memakai pengguna yang login; isi manual hanya lewat "Lapor atas nama orang lain".
+
+## Laporan (`#/laporan`)
+Tersedia untuk semua peran, isinya otomatis dibatasi hak akses (karyawan: tiketnya sendiri, PIC: tim-nya, manajer: department-nya, manajemen dan admin: semuanya).
+
+- **Periode** (hari ini, 7, 30, 90 hari, atau kustom; hari dihitung dalam WIB) dan **filter**: department (manajemen/admin), lokasi (memilih lokasi induk mencakup turunannya), kategori, prioritas, jenis.
+- **KPI**: tiket masuk, selesai, masih terbuka, kepatuhan SLA, rata-rata respons, rata-rata penyelesaian, masing-masing dibandingkan dengan periode sebelumnya
+  (perbandingan disembunyikan bila periode sebelumnya punya kurang dari 5 tiket agar tidak menyesatkan).
+- **Tren** masuk vs selesai (harian, atau mingguan untuk periode di atas 31 hari), rincian per department / kategori / lokasi / prioritas / jenis,
+  **umur tiket terbuka**, **kinerja tim**, **beban dan kinerja PIC**, dan daftar **tiket terlewat SLA** yang paling lama.
+- **Unduh CSV** (17 kolom, UTF-8 dengan BOM agar terbaca benar di Excel; teks berawalan `=`, `+`, `-`, `@` dinetralkan agar tidak dieksekusi sebagai rumus) dan **Cetak / PDF** (tata letak cetak menyembunyikan menu dan filter).
+- Definisi: "masuk" = tiket dibuat pada periode; "selesai" pada KPI = dari tiket masuk itu; pada grafik tren, selesai dihitung menurut tanggal penyelesaian.
+  "Terlewat SLA" = tiket aktif yang sudah lewat batas, atau tiket selesai yang ditutup setelah batas.
+- Perhitungan ada di `src/domain/Report.js` (murni dan diuji dengan angka hitungan tangan).
+- **Data contoh**: seed berisi 130 tiket riwayat 60 hari (deterministik) agar tren dan perbandingan periode terlihat. Di browser yang sudah punya data lama,
+  administrator bisa memuatnya dari halaman Admin lewat "Tambah data contoh" (aman diklik berulang).
+
+## Halaman Admin (`#/admin/...`, khusus Administrator)
+Konfigurasi dikelola dari UI, disimpan di browser, dan langsung dipakai mesin routing, form, dan dashboard.
+
+| Tab | Isi |
+|---|---|
+| Lokasi | pohon lokasi: tambah, ubah nama, pindah induk, hapus. Mengganti nama ikut memperbarui tiketnya |
+| Department & Tim | department (kepala), tim (ketua, tim on-call, eksternal, jam kerja per hari), anggota (ketersediaan, cakupan area) |
+| Aturan Routing | tambah, ubah, urutkan, hapus aturan; peringatan aturan yang tak akan pernah dipakai; **Uji routing** (bisa simulasi hari & jam) |
+| Kategori & Pertanyaan | kategori, subkategori, dan editor pertanyaan dinamis (teks, angka, pilihan, ya/tidak, wajib) |
+| Pengguna & Peran | tambah, ubah peran, hapus pengguna |
+
+Validasi ada di `src/domain/Admin.js` (bukan di UI): nama unik, referensi harus ada, dan sesuatu yang masih dipakai tidak boleh dihapus
+(lokasi yang punya turunan / tiket, tim yang dipakai aturan atau tim on-call atau PIC, kategori yang punya tiket, dst.).
+Aturan bawaan (`default`, semua tiket lainnya) selalu paling bawah dan tidak bisa dihapus. Administrator terakhir tidak bisa dihapus atau diturunkan.
+Perubahan hanya berlaku untuk tiket baru; tiket yang sudah ada tidak dirutekan ulang.
+"Kembalikan ke bawaan" mengembalikan department, tim, aturan, katalog, dan pengguna ke nilai di `src/config/*` (lokasi dan kategori tidak berubah).
+
+## Yang belum ada
+- Notifikasi (push / email / WhatsApp) dan login sungguhan: butuh backend. Peran dan seluruh konfigurasi admin saat ini tersimpan di sisi browser,
+  jadi hanya berlaku di browser itu. Untuk dipakai bersama, konfigurasi perlu dipindah ke server (`ConfigRepository` sudah dipisahkan untuk itu)
+  dan halaman Admin perlu autentikasi sungguhan.
+- Laporan dihitung di browser dari data lokal; untuk data besar (ribuan tiket) agregasi perlu pindah ke server. Grafik dibuat dengan SVG sendiri (tanpa pustaka).
+- Pengaturan target SLA per prioritas belum bisa diubah dari Admin (masih di `src/domain/constants.js`).
+- Nama pengguna dan anggota tim tidak bisa diubah setelah dibuat (riwayat tiket menautkan lewat nama).
+- Status tiket: Baru → Sedang Ditangani → Selesai.
 
 ## Arsitektur
 domain (entity + usecase, JS murni) <- data (repository) <- app (DI + context) <- presentation (React class)
 
-- Kategori awal ada di `src/config/defaults.js`; kategori baru otomatis tersimpan saat melapor.
-- Ganti backend: buat `ApiTicketRepository` (list/add/save), ganti di `src/app/container.js`.
+- Konfigurasi bawaan (nilai awal): `defaults.js` (nama, kategori), `org.js` (lokasi), `catalog.js` (subkategori & pertanyaan), `routing.js` (department, tim, aturan), `users.js` (pengguna). Setelah admin mengubahnya, yang dipakai adalah salinan di penyimpanan browser.
+- Kategori dan lokasi baru otomatis tersimpan saat membuat tiket.
+- `src/config/workspaces.js` adalah konfigurasi multi-bisnis awal yang belum dipakai UI.
+- Entitas `Ticket` immutable: setiap use case menyimpan salinan baru lewat `ticket.with({...})`.
+- Penamaan lama dipertahankan demi kompatibilitas data: `ticket.branch` = nama lokasi, `ticket.location` = area di dalam lokasi.
+- Ganti backend: buat `ApiTicketRepository` (list/find/nextId/add/save), ganti di `src/app/container.js`.
+- Data di `localStorage` (`opsdesk:tickets:v5`, `opsdesk:locations:v3`, `opsdesk:categories:v3`, `opsdesk:config:v1`, `opsdesk:user`). Data lama (tiket v2–v4, lokasi v1) dimigrasikan otomatis,
+  dan routing tiket lama dihitung ulang. Foto diperkecil (maks. 960 px) sebelum disimpan.

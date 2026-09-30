@@ -1,4 +1,5 @@
 // Kategori awal yang umum untuk semua jenis usaha. Kategori baru ditambahkan pengguna saat melapor.
+// Subkategori dan pertanyaan tambahan tiap kategori ada di catalog.js.
 export const DEFAULT_CATEGORIES = [
   { id: 'peralatan', name: 'Peralatan & Mesin' },
   { id: 'it', name: 'Komputer & Jaringan' },
@@ -6,4 +7,14 @@ export const DEFAULT_CATEGORIES = [
   { id: 'fasilitas', name: 'Kebersihan & Fasilitas' },
   { id: 'stok', name: 'Stok & Persediaan' },
   { id: 'keamanan', name: 'Keamanan & Keselamatan' },
+  { id: 'hr', name: 'HR & Kepegawaian' },
+  { id: 'keuangan', name: 'Keuangan' },
+  { id: 'pengadaan', name: 'Pengadaan' },
+  { id: 'legal', name: 'Legal' },
 ];
+
+// Nama aplikasi & warna utama.
+export const APP = { name: 'OpsDesk', brand: '#065f46' };
+
+// Saran peran pelapor saat melapor atas nama orang lain (boleh diisi bebas).
+export const REPORTER_ROLES = ['Staf', 'Supervisor', 'Manager', 'Kasir', 'Staf Gudang'];

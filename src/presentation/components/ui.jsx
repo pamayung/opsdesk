@@ -1,5 +1,6 @@
 import React from 'react';
-import { PRIORITIES, STATUS, formatMinutes } from '../../domain/constants';
+import { Timer } from 'lucide-react';
+import { PRIORITIES, STATUS, SLA_LEVELS, formatMinutes } from '../../domain/constants';
 
 export class PriorityBadge extends React.PureComponent {
   render() {
@@ -20,10 +21,13 @@ export class StatusBadge extends React.PureComponent {
 export class SlaTimer extends React.PureComponent {
   render() {
     const { ticket, now } = this.props;
-    if (ticket.status === 'done') return <span className="text-xs text-slate-500">Selesai</span>;
-    const m = ticket.remainingMin(now);
-    const tone = m < 0 ? 'bg-red-600 text-white' : m < 30 ? 'bg-red-50 text-red-700' : m < 60 ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-700';
-    return <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold tabular-nums ${tone}`}>⏱ {formatMinutes(m)}</span>;
+    if (ticket.status === 'done') return <span className="text-xs font-medium text-emerald-700">Selesai</span>;
+    const level = ticket.slaLevel(now);
+    return (
+      <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-semibold tabular-nums ${SLA_LEVELS[level].chip}`}>
+        <Timer className="h-3.5 w-3.5" aria-hidden="true" />{formatMinutes(ticket.remainingMin(now))}
+      </span>
+    );
   }
 }
 export class Button extends React.PureComponent {
@@ -33,7 +37,7 @@ export class Button extends React.PureComponent {
       ? 'bg-[var(--brand)] text-white hover:brightness-110'
       : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
     return (
-      <button {...rest} className={`min-h-[44px] rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)] disabled:opacity-50 ${v} ${className}`}>
+      <button type="button" {...rest} className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)] disabled:cursor-not-allowed disabled:opacity-50 ${v} ${className}`}>
         {children}
       </button>
     );
