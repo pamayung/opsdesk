@@ -23,7 +23,7 @@ export default class DispatchPanel extends React.Component {
       return left > 0 ? `Menuju lokasi · Estimasi tiba ${left} menit` : 'Menuju lokasi · Melewati estimasi tiba';
     }
     if (d.status === 'on_site') return `Di lokasi sejak ${formatTime(d.updatedAt)}`;
-    return 'Ditugaskan · Belum berangkat';
+    return 'Assigned · Belum berangkat';
   }
 
   render() {
@@ -39,14 +39,14 @@ export default class DispatchPanel extends React.Component {
 
         {!d && (
           <div className="mt-4 rounded-xl bg-slate-50 p-4">
-            <p className="text-sm font-medium text-slate-800">Belum ada teknisi yang ditugaskan.</p>
+            <p className="text-sm font-medium text-slate-800">Belum ada teknisi yang Assigned.</p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <label className="sr-only" htmlFor="tech-select">Pilih teknisi</label>
               <select id="tech-select" value={techId} onChange={(e) => this.setState({ techId: e.target.value, error: '' })} className="min-h-[44px] flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]">
                 <option value="">Pilih teknisi…</option>
                 {technicians.map((x) => <option key={x.id} value={x.id}>{x.name} · {x.role}</option>)}
               </select>
-              <button type="button" onClick={this.assign} disabled={!techId} className={primary}><UserPlus className="h-4 w-4" aria-hidden="true" />Tugaskan</button>
+              <button type="button" onClick={this.assign} disabled={!techId} className={primary}><UserPlus className="h-4 w-4" aria-hidden="true" />Assign</button>
             </div>
           </div>
         )}
@@ -85,7 +85,7 @@ export default class DispatchPanel extends React.Component {
             <div className="grid gap-2 sm:grid-cols-2">
               {actions.map((a) => <button key={a} type="button" onClick={() => onAction(a)} className={`${secondary} justify-start text-left`}><Zap className="h-4 w-4 shrink-0 text-[var(--brand)]" aria-hidden="true" />{a}</button>)}
             </div>
-            <p className="mt-2 text-xs text-slate-500">Aksi yang dijalankan otomatis tercatat di catatan penanganan.</p>
+            <p className="mt-2 text-xs text-slate-500">Aksi yang dijalankan otomatis tercatat di catatan Assignment.</p>
           </div>
         )}
       </section>
