@@ -1,0 +1,1001 @@
+{
+ "locations": [
+  {
+   "id": 1,
+   "parent_id": null,
+   "slug": "head-office",
+   "name": "Head Office",
+   "kind": "head_office",
+   "path": "1",
+   "path_names": "Head Office",
+   "depth": 1,
+   "is_active": true
+  },
+  {
+   "id": 2,
+   "parent_id": null,
+   "slug": "operations",
+   "name": "Operations",
+   "kind": "outlet",
+   "path": "2",
+   "path_names": "Operations",
+   "depth": 1,
+   "is_active": true
+  },
+  {
+   "id": 3,
+   "parent_id": 2,
+   "slug": "area-1",
+   "name": "Area 1",
+   "kind": "outlet",
+   "path": "2.3",
+   "path_names": "Operations > Area 1",
+   "depth": 2,
+   "is_active": true
+  },
+  {
+   "id": 4,
+   "parent_id": 3,
+   "slug": "senopati",
+   "name": "Senopati",
+   "kind": "outlet",
+   "path": "2.3.4",
+   "path_names": "Operations > Area 1 > Senopati",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 5,
+   "parent_id": 3,
+   "slug": "kemang",
+   "name": "Kemang",
+   "kind": "outlet",
+   "path": "2.3.5",
+   "path_names": "Operations > Area 1 > Kemang",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 6,
+   "parent_id": 2,
+   "slug": "area-2",
+   "name": "Area 2",
+   "kind": "outlet",
+   "path": "2.6",
+   "path_names": "Operations > Area 2",
+   "depth": 2,
+   "is_active": true
+  },
+  {
+   "id": 7,
+   "parent_id": 6,
+   "slug": "pim",
+   "name": "PIM",
+   "kind": "outlet",
+   "path": "2.6.7",
+   "path_names": "Operations > Area 2 > PIM",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 8,
+   "parent_id": 6,
+   "slug": "bsd",
+   "name": "BSD",
+   "kind": "outlet",
+   "path": "2.6.8",
+   "path_names": "Operations > Area 2 > BSD",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 9,
+   "parent_id": null,
+   "slug": "distribution-center",
+   "name": "Distribution Center",
+   "kind": "warehouse",
+   "path": "9",
+   "path_names": "Distribution Center",
+   "depth": 1,
+   "is_active": true
+  },
+  {
+   "id": 10,
+   "parent_id": 9,
+   "slug": "dc-cikarang",
+   "name": "DC Cikarang",
+   "kind": "warehouse",
+   "path": "9.10",
+   "path_names": "Distribution Center > DC Cikarang",
+   "depth": 2,
+   "is_active": true
+  },
+  {
+   "id": 11,
+   "parent_id": 10,
+   "slug": "dc-warehouse",
+   "name": "Warehouse",
+   "kind": "warehouse",
+   "path": "9.10.11",
+   "path_names": "Distribution Center > DC Cikarang > Warehouse",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 12,
+   "parent_id": 10,
+   "slug": "dc-fleet",
+   "name": "Fleet",
+   "kind": "warehouse",
+   "path": "9.10.12",
+   "path_names": "Distribution Center > DC Cikarang > Fleet",
+   "depth": 3,
+   "is_active": true
+  },
+  {
+   "id": 13,
+   "parent_id": 10,
+   "slug": "dc-maintenance",
+   "name": "Maintenance",
+   "kind": "warehouse",
+   "path": "9.10.13",
+   "path_names": "Distribution Center > DC Cikarang > Maintenance",
+   "depth": 3,
+   "is_active": true
+  }
+ ],
+ "categories": [
+  {
+   "id": 8,
+   "slug": "keuangan",
+   "name": "Finance",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 21,
+     "category_id": 8,
+     "slug": "ap",
+     "name": "Invoice vendor (Account Payable)",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 32,
+       "position": 1,
+       "label": "Nama vendor",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 33,
+       "position": 2,
+       "label": "Nomor invoice",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "category_id": 8,
+     "slug": "expense",
+     "name": "Reimbursement (Employee Expense)",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 34,
+       "position": 1,
+       "label": "Nominal (Rp)",
+       "type": "number",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "slug": "hr",
+   "name": "HR",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 17,
+     "category_id": 7,
+     "slug": "recruitment",
+     "name": "Recruitment",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 28,
+       "position": 1,
+       "label": "Posisi",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 29,
+       "position": 2,
+       "label": "Jumlah kebutuhan",
+       "type": "number",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "category_id": 7,
+     "slug": "payroll",
+     "name": "Payroll",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 30,
+       "position": 1,
+       "label": "Periode gaji",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": "Contoh: September 2026"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "category_id": 7,
+     "slug": "relations",
+     "name": "Employee relations",
+     "position": 3,
+     "is_active": true,
+     "questions": []
+    },
+    {
+     "id": 20,
+     "category_id": 7,
+     "slug": "dokumen",
+     "name": "Surat & dokumen",
+     "position": 4,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 31,
+       "position": 1,
+       "label": "Jenis dokumen",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "slug": "fasilitas",
+   "name": "Kebersihan & Fasilitas",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 11,
+     "category_id": 4,
+     "slug": "toilet",
+     "name": "Toilet & kebersihan",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 22,
+       "position": 1,
+       "label": "Masalah",
+       "type": "select",
+       "options": [
+        "Bocor",
+        "Mampet",
+        "Fasilitas rusak",
+        "Perlu dibersihkan"
+       ],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "category_id": 4,
+     "slug": "gedung",
+     "name": "Bangunan & interior",
+     "position": 2,
+     "is_active": true,
+     "questions": []
+    },
+    {
+     "id": 13,
+     "category_id": 4,
+     "slug": "kantor",
+     "name": "Kebutuhan kantor (kartu nama, ATK)",
+     "position": 3,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 23,
+       "position": 1,
+       "label": "Barang yang diminta",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 24,
+       "position": 2,
+       "label": "Jumlah",
+       "type": "number",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "slug": "it",
+   "name": "Komputer & Jaringan",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 1,
+     "category_id": 2,
+     "slug": "pos",
+     "name": "POS / Kasir",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 1,
+       "position": 1,
+       "label": "Nomor POS / terminal",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": "Contoh: POS 1"
+      },
+      {
+       "id": 2,
+       "position": 2,
+       "label": "Gejala",
+       "type": "select",
+       "options": [
+        "Mati total",
+        "Lambat / hang",
+        "Printer struk bermasalah",
+        "Tidak bisa login"
+       ],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 3,
+       "position": 3,
+       "label": "Transaksi masih bisa lewat POS lain?",
+       "type": "yesno",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 2,
+     "category_id": 2,
+     "slug": "network",
+     "name": "Jaringan / Internet",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 4,
+       "position": 1,
+       "label": "Gejala",
+       "type": "select",
+       "options": [
+        "Tidak ada koneksi",
+        "Lambat",
+        "Putus-putus"
+       ],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 5,
+       "position": 2,
+       "label": "Yang terdampak",
+       "type": "select",
+       "options": [
+        "1 orang / 1 perangkat",
+        "Beberapa orang",
+        "Satu area atau lantai",
+        "Seluruh lokasi"
+       ],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 3,
+     "category_id": 2,
+     "slug": "enduser",
+     "name": "Perangkat pengguna (laptop, printer)",
+     "position": 3,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 6,
+       "position": 1,
+       "label": "Jenis perangkat",
+       "type": "select",
+       "options": [
+        "Laptop",
+        "Desktop",
+        "Printer",
+        "Lainnya"
+       ],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 7,
+       "position": 2,
+       "label": "Nomor aset",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": "Optional"
+      },
+      {
+       "id": 8,
+       "position": 3,
+       "label": "Apa yang terjadi?",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "category_id": 2,
+     "slug": "bizapp",
+     "name": "Aplikasi bisnis (SAP dll.)",
+     "position": 4,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 9,
+       "position": 1,
+       "label": "Aplikasi",
+       "type": "select",
+       "options": [
+        "SAP",
+        "Aplikasi HR",
+        "Aplikasi Finance",
+        "Lainnya"
+       ],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 10,
+       "position": 2,
+       "label": "Akses atau modul yang dibutuhkan",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 11,
+       "position": 3,
+       "label": "Pesan error",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": "Optional"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "category_id": 2,
+     "slug": "wms",
+     "name": "Sistem gudang (WMS)",
+     "position": 5,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 12,
+       "position": 1,
+       "label": "Operasional gudang berhenti?",
+       "type": "yesno",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 13,
+       "position": 2,
+       "label": "Modul yang bermasalah",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "slug": "legal",
+   "name": "Legal",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 25,
+     "category_id": 10,
+     "slug": "kontrak",
+     "name": "Review kontrak",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 39,
+       "position": 1,
+       "label": "Pihak lawan",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 40,
+       "position": 2,
+       "label": "Jenis dokumen",
+       "type": "select",
+       "options": [
+        "Kontrak vendor",
+        "Sewa",
+        "Kerja sama",
+        "Lainnya"
+       ],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "slug": "utilitas",
+   "name": "Listrik, Air & AC",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 8,
+     "category_id": 3,
+     "slug": "ac",
+     "name": "AC & cooling",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 18,
+       "position": 1,
+       "label": "Jumlah unit",
+       "type": "number",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      },
+      {
+       "id": 19,
+       "position": 2,
+       "label": "Masalah",
+       "type": "select",
+       "options": [
+        "Tidak dingin",
+        "Bocor",
+        "Bunyi berisik",
+        "Mati total"
+       ],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "category_id": 3,
+     "slug": "listrik",
+     "name": "Listrik",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 20,
+       "position": 1,
+       "label": "Masalah",
+       "type": "select",
+       "options": [
+        "Padam",
+        "Sering turun (MCB)",
+        "Kabel / stop kontak rusak"
+       ],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "category_id": 3,
+     "slug": "air",
+     "name": "Air & plumbing",
+     "position": 3,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 21,
+       "position": 1,
+       "label": "Masalah",
+       "type": "select",
+       "options": [
+        "Bocor",
+        "Mampet",
+        "Air tidak mengalir"
+       ],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "slug": "peralatan",
+   "name": "Peralatan & Mesin",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 6,
+     "category_id": 1,
+     "slug": "mesin",
+     "name": "Mesin & peralatan operasional",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 14,
+       "position": 1,
+       "label": "Nama / nomor mesin",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      },
+      {
+       "id": 15,
+       "position": 2,
+       "label": "Masih bisa dipakai?",
+       "type": "yesno",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "category_id": 1,
+     "slug": "forklift",
+     "name": "Forklift & alat berat",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 16,
+       "position": 1,
+       "label": "Nomor unit",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 17,
+       "position": 2,
+       "label": "Unit masih bisa dipakai?",
+       "type": "yesno",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "slug": "pengadaan",
+   "name": "Procurement",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 23,
+     "category_id": 9,
+     "slug": "it",
+     "name": "Pembelian perangkat IT",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 35,
+       "position": 1,
+       "label": "Barang yang dibeli",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 36,
+       "position": 2,
+       "label": "Jumlah",
+       "type": "number",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    },
+    {
+     "id": 24,
+     "category_id": 9,
+     "slug": "umum",
+     "name": "Pembelian umum",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 37,
+       "position": 1,
+       "label": "Barang yang dibeli",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 38,
+       "position": 2,
+       "label": "Jumlah",
+       "type": "number",
+       "options": [],
+       "required": false,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "slug": "keamanan",
+   "name": "Security & Safety",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 15,
+     "category_id": 6,
+     "slug": "akses",
+     "name": "CCTV, kunci & akses",
+     "position": 1,
+     "is_active": true,
+     "questions": []
+    },
+    {
+     "id": 16,
+     "category_id": 6,
+     "slug": "insiden",
+     "name": "Security incident",
+     "position": 2,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 27,
+       "position": 1,
+       "label": "Ada bahaya bagi orang?",
+       "type": "yesno",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "slug": "stok",
+   "name": "Stock & Inventory",
+   "is_active": true,
+   "subcategories": [
+    {
+     "id": 14,
+     "category_id": 5,
+     "slug": "stok",
+     "name": "Stock & inventory",
+     "position": 1,
+     "is_active": true,
+     "questions": [
+      {
+       "id": 25,
+       "position": 1,
+       "label": "Nama barang",
+       "type": "text",
+       "options": [],
+       "required": true,
+       "placeholder": ""
+      },
+      {
+       "id": 26,
+       "position": 2,
+       "label": "Sisa stok",
+       "type": "text",
+       "options": [],
+       "required": false,
+       "placeholder": "Contoh: 2 sleeve"
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "departments": [
+  {
+   "id": 4,
+   "slug": "finance",
+   "name": "Finance",
+   "head_user_id": 28,
+   "is_active": true
+  },
+  {
+   "id": 3,
+   "slug": "ga",
+   "name": "GA & Facility",
+   "head_user_id": 21,
+   "is_active": true
+  },
+  {
+   "id": 2,
+   "slug": "hr",
+   "name": "HR",
+   "head_user_id": 14,
+   "is_active": true
+  },
+  {
+   "id": 1,
+   "slug": "it",
+   "name": "IT",
+   "head_user_id": 41,
+   "is_active": true
+  },
+  {
+   "id": 6,
+   "slug": "legal",
+   "name": "Legal",
+   "head_user_id": 33,
+   "is_active": true
+  },
+  {
+   "id": 8,
+   "slug": "ops",
+   "name": "Operations",
+   "head_user_id": 39,
+   "is_active": true
+  },
+  {
+   "id": 5,
+   "slug": "procurement",
+   "name": "Procurement",
+   "head_user_id": 30,
+   "is_active": true
+  },
+  {
+   "id": 7,
+   "slug": "security",
+   "name": "Security",
+   "head_user_id": 34,
+   "is_active": true
+  }
+ ],
+ "sla_policies": [
+  {
+   "priority": "P1",
+   "respond_minutes": 15,
+   "resolve_minutes": 30,
+   "escalate_ratio": 0.25,
+   "warning_minutes": 60,
+   "critical_minutes": 30
+  },
+  {
+   "priority": "P2",
+   "respond_minutes": 30,
+   "resolve_minutes": 120,
+   "escalate_ratio": 0.25,
+   "warning_minutes": 60,
+   "critical_minutes": 30
+  },
+  {
+   "priority": "P3",
+   "respond_minutes": 120,
+   "resolve_minutes": 720,
+   "escalate_ratio": 0.25,
+   "warning_minutes": 60,
+   "critical_minutes": 30
+  },
+  {
+   "priority": "P4",
+   "respond_minutes": 480,
+   "resolve_minutes": 2880,
+   "escalate_ratio": 0.25,
+   "warning_minutes": 60,
+   "critical_minutes": 30
+  }
+ ],
+ "enums": {
+  "request_types": [
+   "incident",
+   "request",
+   "complaint",
+   "question"
+  ],
+  "priorities": [
+   "P1",
+   "P2",
+   "P3",
+   "P4"
+  ],
+  "statuses": [
+   "open",
+   "in_progress",
+   "resolved"
+  ],
+  "roles": [
+   "employee",
+   "pic",
+   "manager",
+   "management",
+   "admin"
+  ]
+ }
+}

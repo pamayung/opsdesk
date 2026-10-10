@@ -2,7 +2,6 @@ import React from 'react';
 import { ChevronRight, Timer, MapPin, User, Clock, TrendingUp } from 'lucide-react';
 import { AppContext } from '../../app/AppContext';
 import { SLA_LEVELS, REQUEST_TYPES, LOCATION_KINDS, formatClock, formatDateTime } from '../../domain/constants';
-import { canHandle } from '../../domain/Access';
 import { PriorityBadge, StatusBadge, Button } from '../components/ui';
 import AssignPanel from '../components/detail/AssignPanel';
 import FieldNotes from '../components/detail/FieldNotes';
@@ -11,22 +10,39 @@ import ResponseCard from '../components/detail/ResponseCard';
 
 export default class TicketDetailPage extends React.Component {
   static contextType = AppContext;
-  state = { now: Date.now() };
-  componentDidMount() { this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000); }
-  componentWillUnmount() { clearInterval(this.timer); }
+  state = { now: Date.now(), ticket: null, loading: true, error: '' };
+  componentDidMount() {
+    this.mounted = true;
+    this.timer = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    this.reload = setInterval(() => this.load(), 60000); // pembaruan dari pihak lain + tautan foto bertanda tangan (berumur 15 menit) diperbarui
+    this.load();
+  }
+  componentWillUnmount() { this.mounted = false; clearInterval(this.timer); clearInterval(this.reload); }
+  load = async () => {
+    try {
+      const ticket = await this.context.container.tickets.get(this.id);
+      if (this.mounted) this.setState({ ticket, loading: false, error: '' });
+    } catch (err) { if (this.mounted) this.setState({ loading: false, error: err.message }); }
+  };
 
-  // Jalankan use case. Sukses -> render ulang & (opsional) toast. Gagal -> kembalikan pesan error ke panel.
-  attempt = (fn, okMessage) => {
-    try { fn(); this.context.refresh(); if (okMessage) this.context.notify(okMessage); return null; }
-    catch (err) { return err.message; }
+  // Jalankan aksi ke server. Sukses -> tiket diganti hasil terbaru & (opsional) toast. Gagal -> kembalikan pesan error ke panel.
+  attempt = async (fn, okMessage) => {
+    try {
+      const ticket = await fn();
+      if (this.mounted) this.setState({ ticket });
+      this.context.refresh();
+      if (okMessage) this.context.notify(okMessage);
+      return null;
+    } catch (err) { return err.message; }
   };
   get id() { return this.context.ticketId; }
 
-  take = () => { const e = this.attempt(() => this.context.container.takeTicket.execute(this.id, this.context.user), `Tiket ${this.id} di-take.`); if (e) this.context.notify(e); };
-  assign = (name) => this.attempt(() => this.context.container.assignPic.execute(this.id, name, this.context.user), `${name} set as PIC.`);
-  sendNote = ({ text, image }) => this.attempt(() => this.context.container.addNote.execute(this.id, { actor: this.context.user, text, image }));
-  close = ({ note }) => this.attempt(() => this.context.container.closeTicket.execute(this.id, { actor: this.context.user, note }), `Tiket ${this.id} resolved.`);
-  escalate = ({ to }) => this.attempt(() => this.context.container.escalateTicket.execute(this.id, this.context.user, { to }), 'Tiket di-escalate.');
+  take = async () => { const e = await this.attempt(() => this.context.container.tickets.take(this.id), `Tiket ${this.id} di-take.`); if (e) this.context.notify(e); };
+  assign = (name) => this.attempt(() => this.context.container.tickets.assign(this.state.ticket, name), `${name} set as PIC.`);
+  sendNote = ({ text, image }) => this.attempt(() => this.context.container.tickets.addNote(this.id, { text, image }));
+  close = ({ note }) => this.attempt(() => this.context.container.tickets.close(this.id, { note }), `Tiket ${this.id} resolved.`);
+  reopen = ({ reason }) => this.attempt(() => this.context.container.tickets.reopen(this.id, { reason }), `Tiket ${this.id} dibuka kembali. SLA dihitung ulang dari nol.`);
+  escalate = ({ to }) => this.attempt(() => this.context.container.tickets.escalate(this.id, { to }), 'Tiket di-escalate.');
 
   renderMissing() {
     const { goTo } = this.context;
@@ -40,21 +56,26 @@ export default class TicketDetailPage extends React.Component {
   }
 
   render() {
-    const { container, goTo, user } = this.context;
-    const t = container.getTicket.execute(this.id, user);
+    const { container, goTo } = this.context;
+    const t = this.state.ticket;
+    if (this.state.loading) return <p role="status" className="p-8 text-center text-sm text-slate-500">Memuat tiket…</p>;
+    if (this.state.error && !t) return <div role="alert" className="mx-auto max-w-md rounded-2xl bg-red-50 p-6 text-center text-sm text-red-800">{this.state.error}</div>;
     if (!t) return this.renderMissing();
+    const user = this.context.user;
     const { now } = this.state;
     const categories = container.listCategories.execute();
     const category = (categories.find((c) => c.id === t.categoryId) || {}).name || 'Umum';
     const kind = container.locationKind(t.branch);
     const sub = t.subId ? container.catalog.subOf(t.categoryId, t.subId) : null;
-    const handle = canHandle(user, t);
+    const handle = !!(t.permissions && t.permissions.can_assign); // izin aksi dari server
     const level = t.slaLevel(now);
     const alert = level === 'critical' || level === 'breached';
     const sla = SLA_LEVELS[level];
     const esc = t.escalationLevel(now);
+    // Tiket Resolved yang lewat 7 hari: pelapor/manajer diberi tahu mengapa tombol Reopen tidak ada (peran lain tidak pernah bisa reopen).
+    const reopenExpired = t.status === 'done' && !(t.permissions && t.permissions.can_reopen) && (user.role === 'employee' || user.role === 'manager') && !!t.reopenUntil && now > t.reopenUntil;
     const r = t.routing;
-    const deptName = container.departments[t.department].name;
+    const deptName = (container.departments[t.department] || {}).name || '';
 
     return <div className="mx-auto max-w-7xl space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -79,6 +100,7 @@ export default class TicketDetailPage extends React.Component {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <PriorityBadge priority={t.priority} /><StatusBadge status={t.status} />
+              {t.isReopened() && <span className="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-800" data-testid="reopened-badge">Reopened ×{t.reopenCount}</span>}
               <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${REQUEST_TYPES[t.type].tone}`}>{REQUEST_TYPES[t.type].label}</span>
               {esc > 0 && <span className="rounded-full bg-orange-50 px-2.5 py-1 text-xs font-bold text-orange-700">SLA Escalation L{esc}</span>}
               {t.escalation && <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">Vendor escalation</span>}
@@ -96,7 +118,7 @@ export default class TicketDetailPage extends React.Component {
                 {esc === 1 ? `Belum di-respond melewati target ${t.respondTarget} min. Ditandai untuk team lead ${r.escalation.l1}.` : `SLA time left < 25%. Ditandai untuk ${r.escalation.l2} (department head).`}
               </p>
             )}
-            {t.status === 'open' && handle && <Button className="mt-4" onClick={this.take}>Take Ticket</Button>}
+            {t.status === 'open' && t.permissions && t.permissions.can_take && <Button className="mt-4" onClick={this.take}>Take Ticket</Button>}
           </div>
           <dl className="grid shrink-0 grid-cols-2 gap-4 rounded-xl bg-slate-50 p-4 text-sm sm:grid-cols-3 lg:w-[440px]">
             <div className="col-span-2 sm:col-span-1"><dt className="flex items-center gap-1.5 text-xs text-slate-500"><MapPin className="h-3.5 w-3.5" aria-hidden="true" />Lokasi</dt><dd className="mt-1 font-semibold text-slate-900">{t.branch || '-'}</dd><dd className="text-xs text-slate-500">{[container.locationPath(t.branch).split(' › ').slice(1).join(' › '), t.location].filter(Boolean).join(' · ')}{kind ? `${container.locationPath(t.branch).includes('›') || t.location ? ' · ' : ''}${LOCATION_KINDS[kind].label}` : ''}</dd></div>
@@ -108,11 +130,11 @@ export default class TicketDetailPage extends React.Component {
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
         <div className="min-w-0 space-y-5">
-          <AssignPanel ticket={t} departmentName={deptName} members={r ? container.membersOf(r.teamId) : []} user={user} canHandle={handle} onAssign={this.assign} />
+          <AssignPanel ticket={t} departmentName={deptName} members={(t.assignable || []).map((u) => u.name)} user={user} canHandle={handle} onAssign={this.assign} />
           <FieldNotes ticket={t} onSend={this.sendNote} />
         </div>
         <div className="min-w-0 space-y-5">
-          <ClosurePanel ticket={t} now={now} readOnly={!handle} onClose={this.close} onEscalate={this.escalate} />
+          <ClosurePanel ticket={t} now={now} readOnly={!handle} onClose={this.close} onEscalate={this.escalate} onReopen={this.reopen} canReopen={!!(t.permissions && t.permissions.can_reopen)} reopenExpired={reopenExpired} />
           <ResponseCard ticket={t} now={now} />
         </div>
       </div>

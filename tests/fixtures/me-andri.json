@@ -1,0 +1,13 @@
+{
+ "id": 41,
+ "name": "Andri Wijaya",
+ "email": "andri-wijaya@opsdesk.example",
+ "title": "Head of IT",
+ "role": "manager",
+ "department_id": 1,
+ "default_location_id": null,
+ "is_external": false,
+ "is_active": true,
+ "created_at": "0001-01-01T00:00:00Z",
+ "teams": []
+}

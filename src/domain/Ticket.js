@@ -1,38 +1,36 @@
 import { PRIORITIES, ESCALATION_RATIO } from './constants';
-import { makeNote, systemNote, routingNote } from './Note';
 
 // Catatan penamaan: `branch` = nama lokasi (mis. Senopati), `location` = area di dalam lokasi itu (mis. Area kasir).
 export default class Ticket {
   constructor(p) {
     Object.assign(this, {
       type: 'incident', routing: null, subId: null, answers: [], branch: '', description: '', reporterRole: '', notes: [],
-      escalation: null, resolution: null, respondedAt: null, assignee: null,
+      escalation: null, resolution: null, respondedAt: null, assignee: null, dueAt: null, respondDueAt: null, policy: null,
+      permissions: null, assignable: [],
+      slaStartAt: null, reopenCount: 0, reopenedAt: null, reopenUntil: null,
     }, p);
-  }
-  static create({ id, type, routing, subId, answers, branch, location, priority, categoryId, title, description, reporter, reporterRole, image }, now = Date.now()) {
-    const notes = [systemNote('Ticket created and added to the queue', now)];
-    if (routing) notes.push(routingNote(routing, now));
-    if (description || image) {
-      notes.push(makeNote({ party: 'reporter', author: reporter, role: reporterRole, text: description, image, at: now }));
-    }
-    return new Ticket({ id, type, routing, subId, answers: answers || [], branch, location, priority, categoryId, title, description, reporter, reporterRole, notes, status: 'open', createdAt: now });
   }
   // Entitas diperlakukan immutable: setiap perubahan menghasilkan salinan baru.
   with(patch) { return new Ticket({ ...this, ...patch }); }
 
-  get slaMinutes() { return PRIORITIES[this.priority].sla; }
-  get respondTarget() { return PRIORITIES[this.priority].respond; }
-  remainingMin(now = Date.now()) { return this.slaMinutes - (now - this.createdAt) / 60000; }
-  ageMin(now = Date.now()) { return (now - this.createdAt) / 60000; }
+  // SLA mengikuti tenggat dari server (dueAt/respondDueAt) dan kebijakan SLA yang berlaku (policy); tanpa itu, jatuh ke konstanta bawaan.
+  // Awal siklus SLA: saat dibuat, atau saat dibuka kembali terakhir (SLA mulai dari nol). createdAt tetap untuk tampilan "Created".
+  get cycleStart() { return this.slaStartAt || this.createdAt; }
+  get slaMinutes() { return this.dueAt ? (this.dueAt - this.cycleStart) / 60000 : PRIORITIES[this.priority].sla; }
+  get respondTarget() { return this.respondDueAt ? (this.respondDueAt - this.cycleStart) / 60000 : PRIORITIES[this.priority].respond; }
+  remainingMin(now = Date.now()) { return this.dueAt ? (this.dueAt - now) / 60000 : this.slaMinutes - (now - this.cycleStart) / 60000; }
+  ageMin(now = Date.now()) { return (now - this.cycleStart) / 60000; }
   slaLevel(now = Date.now()) {
     if (this.status === 'done') return 'done';
     const m = this.remainingMin(now);
-    return m < 0 ? 'breached' : m < 30 ? 'critical' : m < 60 ? 'warning' : 'ok';
+    const crit = this.policy ? this.policy.critical : 30; const warn = this.policy ? this.policy.warning : 60;
+    return m < 0 ? 'breached' : m < crit ? 'critical' : m < warn ? 'warning' : 'ok';
   }
   // Eskalasi SLA otomatis: 0 = tidak ada, 1 = belum direspons melewati target, 2 = sisa SLA < 25% / terlewat.
   escalationLevel(now = Date.now()) {
     if (this.status === 'done') return 0;
-    if (this.remainingMin(now) < this.slaMinutes * ESCALATION_RATIO) return 2;
+    const ratio = this.policy ? this.policy.ratio : ESCALATION_RATIO;
+    if (this.remainingMin(now) < (this.policy ? this.policy.resolveMin : this.slaMinutes) * ratio) return 2;
     return this.respondedAt === null && this.ageMin(now) > this.respondTarget ? 1 : 0;
   }
   // Perlu perhatian: SLA mendekati/kritis/terlewat atau sudah naik eskalasi.
@@ -46,7 +44,7 @@ export default class Ticket {
   }
   isMine(name) { return this.assignee === name || (!!this.routing && !!this.routing.pic && this.routing.pic.name === name); }
   // Menit dari tiket dibuat sampai selesai. null bila belum selesai.
-  resolutionMin() { return this.status === 'done' && this.resolution ? (this.resolution.closedAt - this.createdAt) / 60000 : null; }
+  resolutionMin() { return this.status === 'done' && this.resolution ? (this.resolution.closedAt - this.cycleStart) / 60000 : null; }
   // Pernah melewati batas SLA: tiket aktif yang sudah lewat, atau tiket selesai yang ditutup setelah batas.
   wasBreached(now = Date.now()) {
     if (this.status === 'done') { const m = this.resolutionMin(); return m !== null && m > this.slaMinutes; }
@@ -55,6 +53,7 @@ export default class Ticket {
   isCritical(now) { return this.slaLevel(now) === 'critical'; }
   isBreached(now) { return this.slaLevel(now) === 'breached'; }
   // Menit dari tiket dibuat sampai direspons (diambil / teknisi ditugaskan). null = belum direspons.
-  responseMin() { return this.respondedAt ? (this.respondedAt - this.createdAt) / 60000 : null; }
+  responseMin() { return this.respondedAt ? (this.respondedAt - this.cycleStart) / 60000 : null; }
+  isReopened() { return this.reopenCount > 0; }
   hasImage() { return this.notes.some((n) => n.image); }
 }

@@ -1,0 +1,36 @@
+{
+ "rule_code": "it-pos",
+ "department": {
+  "id": 1,
+  "name": "IT"
+ },
+ "team": {
+  "id": 1,
+  "name": "IT Support Area"
+ },
+ "pic": {
+  "id": 1,
+  "name": "Kevin Mahendra"
+ },
+ "pic_by_area": true,
+ "pic_load": 3,
+ "off_hours": false,
+ "is_external": false,
+ "no_pic_available": false,
+ "escalation_l1": {
+  "id": 1,
+  "name": "Kevin Mahendra"
+ },
+ "escalation_l2": {
+  "id": 41,
+  "name": "Andri Wijaya"
+ },
+ "sla": {
+  "priority": "P3",
+  "respond_minutes": 120,
+  "resolve_minutes": 720,
+  "escalate_ratio": 0.25,
+  "warning_minutes": 60,
+  "critical_minutes": 30
+ }
+}

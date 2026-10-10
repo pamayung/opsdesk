@@ -13,12 +13,12 @@ class DepartmentEditor extends AdminTab {
     const d = props.deptId ? ctx.container.departments[props.deptId] : { name: '', head: '' };
     this.state = { error: '', name: d.name, head: d.head };
   }
-  save = (e) => {
+  save = async (e) => {
     e.preventDefault();
     const { deptId, onSaved } = this.props; const f = this.state;
-    if (deptId) { this.act(() => this.admin.updateDepartment(deptId, f), 'Department diperbarui.'); return; }
+    if (deptId) { await this.act(() => this.admin.updateDepartment(deptId, f), 'Department diperbarui.'); return; }
     let id = null;
-    if (this.act(() => { id = this.admin.addDepartment(f); }, 'Department ditambahkan.')) onSaved(id);
+    if (await this.act(async () => { id = await this.admin.addDepartment(f); }, 'Department ditambahkan.')) onSaved(id);
   };
   render() {
     const { deptId, onDeleted } = this.props;
@@ -26,9 +26,9 @@ class DepartmentEditor extends AdminTab {
       <form onSubmit={this.save} className="space-y-4">
         <h2 className="font-semibold text-slate-950">{deptId ? 'Ubah department' : 'Department baru'}</h2>
         <Field label="Nama department" htmlFor="dept-name"><input id="dept-name" className={`${inputCls} mt-1`} value={this.state.name} onChange={(e) => this.setState({ name: e.target.value, error: '' })} /></Field>
-        <Field label="Department head" htmlFor="dept-head" hint="Menerima escalation SLA level 2."><input id="dept-head" className={`${inputCls} mt-1`} value={this.state.head} onChange={(e) => this.setState({ head: e.target.value, error: '' })} /></Field>
+        <Field label="Department head" htmlFor="dept-head" hint="Menerima escalation SLA level 2."><select id="dept-head" className={`${inputCls} mt-1`} value={this.state.head} onChange={(e) => this.setState({ head: e.target.value, error: '' })}><option value="">Tidak ada</option>{this.context.container.users.filter((u) => !u.inactive || u.name === this.state.head).map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}</select></Field>
         <ErrorNote error={this.state.error} />
-        <div className="flex items-center gap-2"><button type="submit" className={btnPrimary}>Simpan</button>{deptId && <ConfirmButton onConfirm={() => this.act(() => this.admin.removeDepartment(deptId), 'Department dihapus.') && onDeleted()} />}</div>
+        <div className="flex items-center gap-2"><button type="submit" className={btnPrimary}>Simpan</button>{deptId && <ConfirmButton onConfirm={async () => { if (await this.act(() => this.admin.removeDepartment(deptId), 'Department dinonaktifkan.')) onDeleted(); }} />}</div>
       </form>
     );
   }
@@ -49,16 +49,16 @@ class TeamEditor extends AdminTab {
   set = (k) => (e) => this.setState({ [k]: e.target.value, error: '' });
   toggleDay = (d) => this.setState((s) => ({ days: s.days.includes(d) ? s.days.filter((x) => x !== d) : [...s.days, d], error: '' }));
   input() { const s = this.state; return { name: s.name, department: s.department, lead: s.lead, onCall: s.onCall, external: s.external, hours: s.sched ? { days: s.days, from: s.from, to: s.to } : null }; }
-  save = (e) => {
+  save = async (e) => {
     e.preventDefault();
     const { teamId, onSaved } = this.props;
-    if (teamId) { this.act(() => this.admin.updateTeam(teamId, this.input()), 'Team diperbarui.'); return; }
+    if (teamId) { await this.act(() => this.admin.updateTeam(teamId, this.input()), 'Team diperbarui.'); return; }
     let id = null;
-    if (this.act(() => { id = this.admin.addTeam(this.input()); }, 'Team ditambahkan. Tambahkan member-nya di bawah.')) onSaved(id);
+    if (await this.act(async () => { id = await this.admin.addTeam(this.input()); }, 'Team ditambahkan. Tambahkan member-nya di bawah.')) onSaved(id);
   };
-  addMember = (e) => {
+  addMember = async (e) => {
     e.preventDefault();
-    if (this.act(() => this.admin.addMember(this.props.teamId, { name: this.state.newMember }), 'Member ditambahkan.')) this.setState({ newMember: '' });
+    if (await this.act(() => this.admin.addMember(this.props.teamId, { name: this.state.newMember }), 'Member ditambahkan.')) this.setState({ newMember: '' });
   };
   patchMember = (m, patch) => this.act(() => this.admin.updateMember(this.props.teamId, m.id, { available: m.available, scope: m.scope || [], ...patch }));
 
@@ -68,7 +68,7 @@ class TeamEditor extends AdminTab {
     return (
       <div className="mt-6 border-t border-slate-100 pt-5">
         <h3 className="flex items-center gap-2 font-semibold text-slate-950"><Users className="h-4 w-4 text-[var(--brand)]" aria-hidden="true" />Members ({team.members.length})</h3>
-        <p className="mt-1 text-xs text-slate-500">PIC dipilih dari member yang available dan mencakup lokasi tiket. Tanpa area scope = mencakup semua lokasi. Nama member tidak bisa diubah; hapus lalu tambah ulang bila perlu.</p>
+        <p className="mt-1 text-xs text-slate-500">PIC dipilih dari member yang available dan mencakup lokasi tiket. Tanpa area scope = mencakup semua lokasi. Member dipilih dari pengguna yang sudah terdaftar.</p>
         <ul className="mt-3 space-y-2">
           {team.members.map((m) => {
             const scope = m.scope || [];
@@ -97,8 +97,11 @@ class TeamEditor extends AdminTab {
           {!team.members.length && <li className="rounded-xl border border-dashed border-slate-200 p-3 text-sm text-slate-500">Belum ada member. Tiket akan diteruskan ke team lead.</li>}
         </ul>
         <form onSubmit={this.addMember} className="mt-3 flex gap-2">
-          <label htmlFor="member-name" className="sr-only">Nama member baru</label>
-          <input id="member-name" className={inputCls} value={this.state.newMember} onChange={this.set('newMember')} placeholder="Nama member baru" />
+          <label htmlFor="member-name" className="sr-only">Pengguna yang akan ditambahkan</label>
+          <select id="member-name" className={inputCls} value={this.state.newMember} onChange={this.set('newMember')}>
+            <option value="">Pilih pengguna…</option>
+            {this.context.container.users.filter((u) => !u.inactive && !team.members.some((m) => m.id === u.id)).map((u) => <option key={u.id} value={u.name}>{u.name}{u.title ? ` · ${u.title}` : ''}</option>)}
+          </select>
           <button type="submit" className={btnSecondary}><Plus className="h-4 w-4" aria-hidden="true" />Tambah</button>
         </form>
       </div>
@@ -122,7 +125,7 @@ class TeamEditor extends AdminTab {
                 <option value="">Pilih department…</option>{Object.entries(container.departments).map(([k, d]) => <option key={k} value={k}>{d.name}</option>)}
               </select>
             </Field>
-            <Field label="Team lead" htmlFor="team-lead" hint="Menerima escalation SLA level 1."><input id="team-lead" className={`${inputCls} mt-1`} value={s.lead} onChange={this.set('lead')} /></Field>
+            <Field label="Team lead" htmlFor="team-lead" hint="Menerima escalation SLA level 1."><select id="team-lead" className={`${inputCls} mt-1`} value={s.lead} onChange={this.set('lead')}><option value="">Tidak ada</option>{container.users.filter((u) => !u.inactive || u.name === s.lead).map((u) => <option key={u.id} value={u.name}>{u.name}</option>)}</select></Field>
             <Field label="On-call team" htmlFor="team-oncall" hint="Menerima tiket di luar working hours.">
               <select id="team-oncall" className={`${inputCls} mt-1`} value={s.onCall} onChange={this.set('onCall')}>
                 <option value="">Tidak ada</option>{others.map(([k, t]) => <option key={k} value={k}>{t.name}</option>)}
@@ -152,7 +155,7 @@ class TeamEditor extends AdminTab {
           <ErrorNote error={s.error} />
           <div className="flex items-center gap-2">
             <button type="submit" className={btnPrimary}>Simpan</button>
-            {teamId && <ConfirmButton onConfirm={() => this.act(() => this.admin.removeTeam(teamId), 'Team dihapus.') && onDeleted()} />}
+            {teamId && <ConfirmButton onConfirm={async () => { if (await this.act(() => this.admin.removeTeam(teamId), 'Team dinonaktifkan.')) onDeleted(); }} />}
           </div>
         </form>
         {team ? this.renderMembers(team) : <p className="mt-5 text-sm text-slate-500">Simpan team ini dulu, lalu tambahkan member-nya.</p>}

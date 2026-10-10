@@ -12,6 +12,17 @@ const hours = (h) => (h === null ? '-' : `${h.toFixed(1)} hr`);
 
 export default class DashboardPage extends React.Component {
   static contextType = AppContext;
+  state = { tickets: [], loaded: false };
+  componentDidMount() { this.mounted = true; this.rev = this.context.rev; this.load(); }
+  componentDidUpdate() { if (this.context.rev !== this.rev) { this.rev = this.context.rev; this.load(); } } // refresh dari App (tiap 30 detik / setelah aksi)
+  componentWillUnmount() { this.mounted = false; }
+  // Daftar ringkas untuk employee dan PIC diambil dari server (urut SLA); manager dan management memakai daftar Needs attention dari ringkasan.
+  load = async () => {
+    const { container, user } = this.context;
+    const f = user.role === 'employee' ? { status: 'all', pageSize: 6 } : user.role === 'pic' ? { status: 'active', pageSize: 6 } : null;
+    if (!f) { this.setState({ loaded: true }); return; }
+    try { const { items } = await container.tickets.list(f); if (this.mounted) this.setState({ tickets: items, loaded: true }); } catch (e) { if (this.mounted) this.setState({ loaded: true }); }
+  };
 
   stat(label, value, hint, tone = '') {
     return <Card key={label}><p className="text-xs text-slate-500">{label}</p><p className={`mt-1 text-3xl font-bold ${tone}`}>{value}</p><p className="mt-1 text-xs text-slate-500">{hint}</p></Card>;
@@ -46,8 +57,7 @@ export default class DashboardPage extends React.Component {
   }
 
   renderEmployee(s, now) {
-    const { container, user } = this.context;
-    const all = container.listTickets.execute({ user, status: 'all' }, now);
+    const all = this.state.tickets;
     return <>
       <section className="grid grid-cols-3 gap-3">
         {this.stat('Open', s.open, 'waiting for PIC')}
@@ -59,9 +69,7 @@ export default class DashboardPage extends React.Component {
   }
 
   renderPic(s, now) {
-    const { container, user } = this.context;
-    const attention = container.listTickets.execute({ user, status: 'active' }, now);
-    const ordered = [...attention.filter((t) => t.atRisk(now)), ...attention.filter((t) => !t.atRisk(now))].slice(0, 6);
+    const ordered = this.state.tickets; // sudah urut SLA dari server
     const P = s.byPriority;
     return <>
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -75,10 +83,9 @@ export default class DashboardPage extends React.Component {
   }
 
   renderManager(s, now) {
-    const { container, user, goTo } = this.context;
-    const teams = container.getTeamQueues.execute(user, now);
-    const active = container.listTickets.execute({ user, status: 'active' }, now);
-    const ordered = [...active.filter((t) => t.atRisk(now)), ...active.filter((t) => !t.atRisk(now))].slice(0, 5);
+    const { container, goTo } = this.context;
+    const teams = container.dashboard.teamQueues();
+    const ordered = container.dashboard.attention();
     return <>
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {this.stat('Open tickets', s.active, `${s.open} unassigned`)}
@@ -87,7 +94,7 @@ export default class DashboardPage extends React.Component {
         {this.stat('Average resolution', hours(s.avgResolutionHours), `dari ${s.resolved} resolved tickets`)}
       </section>
       <section className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-        {this.ticketList('Needs attention', 'Diurutkan dari SLA deadline paling dekat', ordered, now, 'Tidak ada tiket aktif di department Anda.')}
+        {this.ticketList('Needs attention', 'Diurutkan dari SLA deadline paling dekat', ordered, now, 'Tidak ada tiket yang perlu perhatian di department Anda.')}
         <Card>
           <h2 className="font-semibold text-slate-950">Queue per team</h2><p className="text-xs text-slate-500">Team di department Anda</p>
           <ul className="mt-4 space-y-1">
@@ -105,11 +112,10 @@ export default class DashboardPage extends React.Component {
   }
 
   renderManagement(s, now) {
-    const { container, user, goTo, setDept } = this.context;
-    const depts = container.getDepartmentQueues.execute(user, now);
+    const { container, goTo, setDept } = this.context;
+    const depts = container.dashboard.deptQueues();
     const max = Math.max(1, ...depts.map((d) => d.total));
-    const active = container.listTickets.execute({ user, status: 'active' }, now);
-    const ordered = [...active.filter((t) => t.atRisk(now)), ...active.filter((t) => !t.atRisk(now))].slice(0, 5);
+    const ordered = container.dashboard.attention();
     return <>
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {this.stat('Total tickets', s.total.toLocaleString('id-ID'), 'seluruh organisasi')}
@@ -118,15 +124,15 @@ export default class DashboardPage extends React.Component {
         {this.stat('Resolved', s.resolved.toLocaleString('id-ID'), `rata-rata ${hours(s.avgResolutionHours)}`, 'text-emerald-700')}
       </section>
       <section className="grid gap-5 xl:grid-cols-[1.4fr_1fr]">
-        {this.ticketList('Needs attention', 'Diurutkan dari SLA deadline paling dekat', ordered, now, 'Tidak ada tiket aktif.')}
+        {this.ticketList('Needs attention', 'Diurutkan dari SLA deadline paling dekat', ordered, now, 'Tidak ada tiket yang perlu perhatian.')}
         <Card>
-          <h2 className="font-semibold text-slate-950">Tickets per department</h2><p className="text-xs text-slate-500">Total tickets and how many are still open</p>
+          <h2 className="font-semibold text-slate-950">Active tickets per department</h2><p className="text-xs text-slate-500">Tiket yang masih berjalan per department</p>
           <ul className="mt-4 space-y-1">
             {depts.map((d) => (
               <li key={d.id}><button type="button" onClick={() => { setDept(d.id); goTo('tickets'); }} className="w-full rounded-xl p-2.5 text-left hover:bg-slate-50">
                 <span className="flex items-baseline justify-between gap-3"><span className="text-sm font-medium text-slate-900">{d.name}</span><span className="text-sm font-bold tabular-nums text-slate-900">{d.total}</span></span>
                 <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-slate-100"><span className="block h-full rounded-full bg-[var(--brand)]" style={{ width: `${(d.total / max) * 100}%` }} /></span>
-                <span className="mt-1 block text-xs text-slate-500">{d.count} open{d.risk > 0 && <span className="font-medium text-red-600"> · {d.risk} at SLA risk</span>}</span>
+                <span className="mt-1 block text-xs text-slate-500">{d.waiting} unassigned{d.risk > 0 && <span className="font-medium text-red-600"> · {d.risk} at SLA risk</span>}</span>
               </button></li>
             ))}
           </ul>
@@ -138,9 +144,9 @@ export default class DashboardPage extends React.Component {
   render() {
     const { container, goTo, user } = this.context;
     const now = Date.now();
-    const s = container.getStats.execute(user, now);
+    const s = container.stats;
     const body = { employee: this.renderEmployee, pic: this.renderPic, manager: this.renderManager, management: this.renderManagement, admin: this.renderManagement }[user.role] || this.renderEmployee;
-    const dept = user.role === 'manager' ? container.departments[user.department].name : '';
+    const dept = user.role === 'manager' ? (container.departments[user.department] || {}).name : '';
     return <div className="space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

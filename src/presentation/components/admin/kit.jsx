@@ -40,9 +40,10 @@ export class AdminTab extends React.Component {
   static contextType = AppContext;
   state = { error: '' };
   get admin() { return this.context.container.admin; }
-  // Sukses -> render ulang + toast (opsional) dan mengembalikan true. Gagal -> tampilkan pesan dan mengembalikan false.
-  act = (fn, okMessage) => {
-    try { fn(); this.setState({ error: '' }); this.context.refresh(); if (okMessage) this.context.notify(okMessage); return true; }
+  // Menjalankan operasi ke server. Sukses -> render ulang + toast (opsional) dan mengembalikan true.
+  // Gagal -> pesan dari server ditampilkan di form dan mengembalikan false. SELALU di-await oleh pemanggil.
+  act = async (fn, okMessage) => {
+    try { await fn(); this.setState({ error: '' }); this.context.refresh(); if (okMessage) this.context.notify(okMessage); return true; }
     catch (err) { this.setState({ error: err.message }); return false; }
   };
 }

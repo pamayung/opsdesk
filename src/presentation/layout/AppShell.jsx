@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Inbox, PlusCircle, Search, Bell, Plus, ChevronDown, Check, Settings, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Inbox, PlusCircle, Search, Bell, Plus, ChevronDown, Settings, BarChart3, LogOut, KeyRound } from 'lucide-react';
 import { AppContext } from '../../app/AppContext';
 
 // Nama menu antrean menyesuaikan peran: karyawan melihat tiketnya, PIC antreannya, dst.
@@ -16,10 +16,10 @@ export default class AppShell extends React.Component {
   static contextType = AppContext;
   state = { menu: false };
   render() {
-    const { page, goTo, toast, container, user, query, setQuery, setUser } = this.context;
+    const { page, goTo, toast, container, user, query, setQuery, logout } = this.context;
     const NAV = navFor(user.role);
     const app = container.app;
-    const stats = container.getStats.execute(user, Date.now());
+    const stats = container.stats || { atRisk: 0, active: 0, slaRate: 100 };
     const isActive = (k) => page === k || (k === 'tickets' && page === 'detail');
     const badge = stats.atRisk;
     return <div className="min-h-screen bg-[#f5f7f9] text-slate-900 print:bg-white" style={{ '--brand': app.brand }}>
@@ -46,13 +46,9 @@ export default class AppShell extends React.Component {
             </button>
             {this.state.menu && (
               <div role="menu" className="absolute right-0 top-12 z-40 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                <p className="px-3 py-2 text-xs text-slate-500">Demo role: pilih user untuk melihat dashboard dan akses tiap role.</p>
-                {container.users.map((u) => (
-                  <button key={u.id} type="button" role="menuitemradio" aria-checked={u.id === user.id} onClick={() => { this.setState({ menu: false }); setUser(u.id); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-slate-50">
-                    <span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{u.name}</span><span className="block text-xs text-slate-500">{container.roles[u.role].label} · {u.title}</span></span>
-                    {u.id === user.id && <Check className="h-4 w-4 text-[var(--brand)]" aria-hidden="true" />}
-                  </button>
-                ))}
+                <div className="px-3 py-2"><p className="text-sm font-semibold">{user.name}</p><p className="text-xs text-slate-500">{user.email}</p><p className="text-xs text-slate-500">{container.roles[user.role].label} · {user.title}</p></div>
+                <button type="button" role="menuitem" onClick={() => { this.setState({ menu: false }); goTo('account'); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm hover:bg-slate-50"><KeyRound className="h-4 w-4 text-slate-500" aria-hidden="true" />Change password</button>
+                <button type="button" role="menuitem" onClick={() => { this.setState({ menu: false }); logout(); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-red-700 hover:bg-red-50"><LogOut className="h-4 w-4" aria-hidden="true" />Sign out</button>
               </div>
             )}
           </div>

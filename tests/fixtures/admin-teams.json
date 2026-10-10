@@ -1,0 +1,1210 @@
+[
+ {
+  "id": 17,
+  "slug": "fin_ap",
+  "department_id": 4,
+  "name": "Account Payable",
+  "lead_user_id": 27,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 27,
+    "name": "Ayu Lestari",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 21,
+  "slug": "legal_contract",
+  "department_id": 6,
+  "name": "Contract Management",
+  "lead_user_id": 33,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 32,
+    "name": "Melinda Putri",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 16,
+  "slug": "dc_maintenance",
+  "department_id": 3,
+  "name": "DC Maintenance",
+  "lead_user_id": 26,
+  "on_call_team_id": 14,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 24,
+    "name": "Bambang Susilo",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 25,
+    "name": "Joko Sutrisno",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 18,
+  "slug": "fin_expense",
+  "department_id": 4,
+  "name": "Employee Expense",
+  "lead_user_id": 28,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 28,
+    "name": "Tania Lestari",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 9,
+  "slug": "hr_relations",
+  "department_id": 2,
+  "name": "Employee Relations",
+  "lead_user_id": 13,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 13,
+    "name": "Sinta Dewi",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 13,
+  "slug": "ga_engineering",
+  "department_id": 3,
+  "name": "Engineering",
+  "lead_user_id": 21,
+  "on_call_team_id": 14,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 20,
+    "name": "Agus Pratama",
+    "is_available": false,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 19,
+    "name": "Dewi Lestari",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 14,
+  "slug": "ga_oncall",
+  "department_id": 3,
+  "name": "Engineering On-Call",
+  "lead_user_id": 21,
+  "on_call_team_id": null,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [],
+  "members": [
+   {
+    "user_id": 22,
+    "name": "Joko Widodo",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 11,
+  "slug": "ga_facility",
+  "department_id": 3,
+  "name": "Facility",
+  "lead_user_id": 15,
+  "on_call_team_id": 13,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "07:00",
+    "ends_at": "18:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 15,
+    "name": "Sri Wahyuni",
+    "is_available": true,
+    "scope_location_ids": [
+     1,
+     3
+    ]
+   },
+   {
+    "user_id": 16,
+    "name": "Wawan Setiawan",
+    "is_available": true,
+    "scope_location_ids": [
+     6,
+     9
+    ]
+   }
+  ]
+ },
+ {
+  "id": 12,
+  "slug": "ga_general",
+  "department_id": 3,
+  "name": "General Affair",
+  "lead_user_id": 17,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 18,
+    "name": "Iwan Kurnia",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 17,
+    "name": "Ratna Sari",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 8,
+  "slug": "hr_payroll",
+  "department_id": 2,
+  "name": "HR Payroll",
+  "lead_user_id": 12,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 12,
+    "name": "Bagas Pratama",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 7,
+  "slug": "hr_recruit",
+  "department_id": 2,
+  "name": "HR Recruitment",
+  "lead_user_id": 11,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 11,
+    "name": "Rani Oktaviani",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 10,
+  "slug": "hr_service",
+  "department_id": 2,
+  "name": "HR Service",
+  "lead_user_id": 14,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 14,
+    "name": "Maya Kusuma",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 2,
+  "slug": "it_helpdesk",
+  "department_id": 1,
+  "name": "IT Helpdesk",
+  "lead_user_id": 3,
+  "on_call_team_id": 6,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 3,
+    "name": "Niko Pratama",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 4,
+    "name": "Rara Anjani",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 3,
+  "slug": "it_infra",
+  "department_id": 1,
+  "name": "IT Infrastructure",
+  "lead_user_id": 5,
+  "on_call_team_id": 6,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 5,
+    "name": "Gilang Saputra",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 6,
+    "name": "Wulan Sari",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 6,
+  "slug": "it_oncall",
+  "department_id": 1,
+  "name": "IT On-Call",
+  "lead_user_id": 10,
+  "on_call_team_id": null,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [],
+  "members": [
+   {
+    "user_id": 10,
+    "name": "Fajri Ramadhan",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 19,
+  "slug": "proc_it",
+  "department_id": 5,
+  "name": "IT Procurement",
+  "lead_user_id": 29,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 29,
+    "name": "Farhan Aziz",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 1,
+  "slug": "it_area",
+  "department_id": 1,
+  "name": "IT Support Area",
+  "lead_user_id": 1,
+  "on_call_team_id": 6,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 2,
+    "name": "Budi Santoso",
+    "is_available": true,
+    "scope_location_ids": [
+     6
+    ]
+   },
+   {
+    "user_id": 1,
+    "name": "Kevin Mahendra",
+    "is_available": true,
+    "scope_location_ids": [
+     3
+    ]
+   }
+  ]
+ },
+ {
+  "id": 23,
+  "slug": "inventory",
+  "department_id": 8,
+  "name": "Inventory Outlet",
+  "lead_user_id": 36,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "07:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 36,
+    "name": "Bayu Nugroho",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 20,
+  "slug": "proc_general",
+  "department_id": 5,
+  "name": "Purchasing",
+  "lead_user_id": 30,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 31,
+    "name": "Lala Kurnia",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 30,
+    "name": "Yusuf Rahman",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 4,
+  "slug": "it_bizapp",
+  "department_id": 1,
+  "name": "SAP Support",
+  "lead_user_id": 7,
+  "on_call_team_id": 6,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "17:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 7,
+    "name": "Dimas Wibowo",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 8,
+    "name": "Lia Anggraini",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 22,
+  "slug": "security",
+  "department_id": 7,
+  "name": "Security Desk",
+  "lead_user_id": 34,
+  "on_call_team_id": null,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [],
+  "members": [
+   {
+    "user_id": 34,
+    "name": "Anto Susilo",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 35,
+    "name": "Wahyu Hidayat",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 25,
+  "slug": "service_desk",
+  "department_id": 8,
+  "name": "Service Desk",
+  "lead_user_id": 39,
+  "on_call_team_id": null,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [],
+  "members": [
+   {
+    "user_id": 40,
+    "name": "Dodi Firmansyah",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 39,
+    "name": "Lina Hartati",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 15,
+  "slug": "vendor_ac",
+  "department_id": 3,
+  "name": "Vendor AC & Cooling",
+  "lead_user_id": 21,
+  "on_call_team_id": 14,
+  "is_external": true,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "08:00",
+    "ends_at": "18:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 23,
+    "name": "CV Dingin Jaya (Pak Anton)",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 5,
+  "slug": "it_wms",
+  "department_id": 1,
+  "name": "WMS Support",
+  "lead_user_id": 9,
+  "on_call_team_id": 6,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 9,
+    "name": "Yudi Hartono",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ },
+ {
+  "id": 24,
+  "slug": "warehouse",
+  "department_id": 8,
+  "name": "Warehouse Control",
+  "lead_user_id": 26,
+  "on_call_team_id": 25,
+  "is_external": false,
+  "is_always_on": true,
+  "is_active": true,
+  "working_hours": [
+   {
+    "day_of_week": 1,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 2,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 3,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 4,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 5,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 6,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   },
+   {
+    "day_of_week": 7,
+    "starts_at": "06:00",
+    "ends_at": "22:00"
+   }
+  ],
+  "members": [
+   {
+    "user_id": 38,
+    "name": "Dimas Aditya",
+    "is_available": true,
+    "scope_location_ids": []
+   },
+   {
+    "user_id": 37,
+    "name": "Eko Saputra",
+    "is_available": true,
+    "scope_location_ids": []
+   }
+  ]
+ }
+]

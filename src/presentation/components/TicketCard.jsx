@@ -15,6 +15,7 @@ export default class TicketCard extends React.PureComponent {
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <PriorityBadge priority={t.priority} /><StatusBadge status={t.status} />
+              {t.isReopened() && <span className="rounded-full bg-violet-50 px-2 py-1 text-[11px] font-semibold text-violet-800">Reopened ×{t.reopenCount}</span>}
               <span className="text-xs text-slate-400">#{t.id}</span>
               <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${REQUEST_TYPES[t.type].tone}`}>{REQUEST_TYPES[t.type].label}</span>
               {esc > 0 && <span className="rounded-full bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-700">Escalation L{esc}</span>}

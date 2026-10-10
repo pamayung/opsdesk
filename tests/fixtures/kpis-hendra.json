@@ -1,0 +1,25 @@
+{
+ "comparison_available": false,
+ "kpis": {
+  "total": 4,
+  "resolved": 1,
+  "open": 3,
+  "breached": 0,
+  "sla_rate": 100,
+  "avg_response_min": 0,
+  "avg_resolution_min": 0,
+  "reopened": 1,
+  "reopen_rate": 50
+ },
+ "previous": {
+  "total": 0,
+  "resolved": 0,
+  "open": 0,
+  "breached": 0,
+  "sla_rate": null,
+  "avg_response_min": null,
+  "avg_resolution_min": null,
+  "reopened": 0,
+  "reopen_rate": null
+ }
+}

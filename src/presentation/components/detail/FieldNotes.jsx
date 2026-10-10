@@ -19,10 +19,11 @@ export default class FieldNotes extends React.Component {
     try { const image = await readImage(file); if (this.mounted) this.setState({ image, busy: false }); }
     catch (err) { if (this.mounted) this.setState({ busy: false, error: err.message }); }
   };
-  send = (e) => {
+  send = async (e) => {
     e.preventDefault();
-    const error = this.props.onSend({ text: this.state.text, image: this.state.image });
-    this.setState(error ? { error } : { text: '', image: null, error: '' });
+    this.setState({ busy: true, error: '' });
+    const error = await this.props.onSend({ text: this.state.text, image: this.state.image });
+    if (this.mounted) this.setState(error ? { error, busy: false } : { text: '', image: null, error: '', busy: false });
   };
 
   renderNote(n) {

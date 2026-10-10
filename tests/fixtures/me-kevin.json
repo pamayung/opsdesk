@@ -1,0 +1,18 @@
+{
+ "id": 1,
+ "name": "Kevin Mahendra",
+ "email": "kevin-mahendra@opsdesk.example",
+ "title": "IT Support Area",
+ "role": "pic",
+ "department_id": null,
+ "default_location_id": null,
+ "is_external": false,
+ "is_active": true,
+ "created_at": "0001-01-01T00:00:00Z",
+ "teams": [
+  {
+   "id": 1,
+   "name": "IT Support Area"
+  }
+ ]
+}

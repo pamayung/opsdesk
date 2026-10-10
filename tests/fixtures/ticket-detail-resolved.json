@@ -1,0 +1,198 @@
+{
+ "id": 3,
+ "code": "TCK-0003",
+ "type": "incident",
+ "priority": "P2",
+ "status": "resolved",
+ "title": "Tiket selesai dengan eskalasi vendor",
+ "area": "Area kasir",
+ "location": {
+  "id": 4,
+  "name": "Senopati",
+  "path": "Operations > Area 1 > Senopati"
+ },
+ "category": {
+  "id": 2,
+  "name": "Komputer & Jaringan"
+ },
+ "subcategory": {
+  "id": 1,
+  "name": "POS / Kasir"
+ },
+ "department": {
+  "id": 1,
+  "name": "IT"
+ },
+ "team": {
+  "id": 1,
+  "name": "IT Support Area"
+ },
+ "reporter": {
+  "id": 43,
+  "name": "Rina"
+ },
+ "assignee": {
+  "id": 1,
+  "name": "Kevin Mahendra"
+ },
+ "initial_pic": {
+  "id": 1,
+  "name": "Kevin Mahendra"
+ },
+ "created_at": "2026-10-10T14:24:14.698295Z",
+ "reopen_count": 0,
+ "reopened_at": null,
+ "responded_at": "2026-10-10T14:24:14.705797Z",
+ "resolved_at": "2026-10-10T14:24:14.718844Z",
+ "sla": {
+  "respond_due_at": "2026-10-10T14:54:14.698295Z",
+  "resolve_due_at": "2026-10-10T16:24:14.698295Z",
+  "remaining_min": 120,
+  "level": "done",
+  "escalation_level": 0,
+  "at_risk": false,
+  "breached": false
+ },
+ "description": "Mesin POS mati total saat jam makan siang.",
+ "reported_for": null,
+ "answers": [
+  {
+   "label": "Nomor POS / terminal",
+   "answer": "POS 1"
+  },
+  {
+   "label": "Gejala",
+   "answer": "Mati total"
+  },
+  {
+   "label": "Transaksi masih bisa lewat POS lain?",
+   "answer": "Ya"
+  }
+ ],
+ "events": [
+  {
+   "id": 10,
+   "at": "2026-10-10T14:24:14.698295Z",
+   "kind": "system",
+   "code": "created",
+   "author_id": null,
+   "author_name": "Sistem",
+   "author_label": "",
+   "author_role": "",
+   "body": "Tiket dibuat dan masuk antrean"
+  },
+  {
+   "id": 11,
+   "at": "2026-10-10T14:24:14.698295Z",
+   "kind": "system",
+   "code": "routed",
+   "author_id": null,
+   "author_name": "Sistem",
+   "author_label": "",
+   "author_role": "",
+   "body": "Dirutekan ke IT Support Area, PIC awal Kevin Mahendra"
+  },
+  {
+   "id": 12,
+   "at": "2026-10-10T14:24:14.698295Z",
+   "kind": "note",
+   "code": "",
+   "author_id": 43,
+   "author_name": "Rina",
+   "author_label": "Kasir",
+   "author_role": "employee",
+   "body": "Mesin POS mati total saat jam makan siang."
+  },
+  {
+   "id": 13,
+   "at": "2026-10-10T14:24:14.705797Z",
+   "kind": "system",
+   "code": "assigned",
+   "author_id": null,
+   "author_name": "Sistem",
+   "author_label": "",
+   "author_role": "",
+   "body": "Tiket diambil oleh Kevin Mahendra"
+  },
+  {
+   "id": 14,
+   "at": "2026-10-10T14:24:14.712137Z",
+   "kind": "system",
+   "code": "vendor_escalated",
+   "author_id": null,
+   "author_name": "Sistem",
+   "author_label": "",
+   "author_role": "",
+   "body": "Dieskalasi ke PT Kasir Jaya oleh Kevin Mahendra"
+  },
+  {
+   "id": 15,
+   "at": "2026-10-10T14:24:14.718844Z",
+   "kind": "note",
+   "code": "resolution",
+   "author_id": 1,
+   "author_name": "Kevin Mahendra",
+   "author_label": "IT Support Area",
+   "author_role": "pic",
+   "body": "Penyelesaian: Adaptor diganti baru, POS menyala."
+  },
+  {
+   "id": 16,
+   "at": "2026-10-10T14:24:14.718844Z",
+   "kind": "system",
+   "code": "resolved",
+   "author_id": null,
+   "author_name": "Sistem",
+   "author_label": "",
+   "author_role": "",
+   "body": "Tiket diselesaikan oleh Kevin Mahendra"
+  }
+ ],
+ "routing": {
+  "rule_code": "it-pos",
+  "routed_team": {
+   "id": 1,
+   "name": "IT Support Area"
+  },
+  "initial_pic": {
+   "id": 1,
+   "name": "Kevin Mahendra"
+  },
+  "off_hours": false,
+  "escalation_l1": {
+   "id": 1,
+   "name": "Kevin Mahendra"
+  },
+  "escalation_l2": {
+   "id": 41,
+   "name": "Andri Wijaya"
+  }
+ },
+ "resolution": {
+  "note": "Adaptor diganti baru, POS menyala.",
+  "by": {
+   "id": 1,
+   "name": "Kevin Mahendra"
+  },
+  "at": "2026-10-10T14:24:14.718844Z"
+ },
+ "vendor_escalation": {
+  "to": "PT Kasir Jaya",
+  "at": "2026-10-10T14:24:14.712137Z",
+  "by": {
+   "id": 1,
+   "name": "Kevin Mahendra"
+  }
+ },
+ "attachments": [],
+ "assignable_users": [],
+ "permissions": {
+  "can_take": false,
+  "can_assign": false,
+  "can_add_note": false,
+  "can_resolve": false,
+  "can_escalate_vendor": false,
+  "can_reopen": true
+ },
+ "reopen_until": "2026-10-17T14:24:14.718844Z"
+}

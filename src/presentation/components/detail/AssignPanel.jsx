@@ -4,7 +4,7 @@ import { Users } from 'lucide-react';
 // Penanganan: siapa yang memegang tiket. Pilihan PIC = anggota tim hasil routing + pengguna sendiri.
 export default class AssignPanel extends React.Component {
   state = { pic: '', error: '' };
-  assign = () => this.setState({ error: this.props.onAssign(this.state.pic) || '', pic: '' });
+  assign = async () => { const error = await this.props.onAssign(this.state.pic); this.setState({ error: error || '', pic: '' }); };
 
   render() {
     const { ticket: t, departmentName, members, user, canHandle } = this.props;

@@ -6,3 +6,12 @@ export function downloadText(filename, text, type = 'text/csv;charset=utf-8') {
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+// Mengunduh Blob (mis. CSV dari server). Nama berkas ditentukan pemanggil.
+export function downloadBlob(filename, blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

@@ -11,8 +11,8 @@ const BANNED = {
   unduh: 'Download', unggah: 'Upload', pratinjau: 'Preview', lampiran: 'Attachment', lampirkan: 'Attach', naikkan: 'Move up', turunkan: 'Move down',
   anggota: 'Member', ketua: 'Lead', tersedia: 'Available', ketersediaan: 'Availability', keluhan: 'Complaint', insiden: 'Incident',
 };
-// seed.js = isi tiket demo (kalimat Indonesian yang wajar), bukan label UI.
-const ALLOW = ['src/data/ConfigRepository.js', 'src/data/CategoryRepository.js', 'src/config/workspaces.js', 'src/data/seed.js'];
+// eventText.js = pola teks sistem Indonesian dari database yang diterjemahkan ke English untuk ditampilkan.
+const ALLOW = ['src/data/eventText.js'];
 
 const walk = (d) => readdirSync(d).flatMap((f) => { const p = join(d, f); return statSync(p).isDirectory() ? walk(p) : /\.jsx?$/.test(p) ? [p] : []; });
 const lit = /'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g;

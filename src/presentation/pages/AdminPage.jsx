@@ -1,7 +1,6 @@
 import React from 'react';
-import { ShieldAlert, RotateCcw, DatabaseZap } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import { AppContext } from '../../app/AppContext';
-import { ConfirmButton } from '../components/admin/kit';
 import AdminLocations from './admin/AdminLocations';
 import AdminTeams from './admin/AdminTeams';
 import AdminRules from './admin/AdminRules';
@@ -24,12 +23,6 @@ export const resolveTab = (slug) => { const id = ALIAS[slug] || slug; return TAB
 
 export default class AdminPage extends React.Component {
   static contextType = AppContext;
-  reset = () => { this.context.container.admin.resetConfig(); this.context.refresh(); this.context.notify('Configuration reset to default.'); };
-  sample = () => {
-    const n = this.context.container.admin.loadSampleHistory();
-    this.context.refresh();
-    this.context.notify(n ? `${n} sample tickets (60-day history) added. See the Reports menu.` : 'Sample data already exists.');
-  };
   render() {
     const { user, ticketId: tab, goTo } = this.context;
     if (user.role !== 'admin') {
@@ -49,11 +42,7 @@ export default class AdminPage extends React.Component {
           <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">Admin</h1>
           <p className="mt-1 text-sm text-slate-600">Perubahan langsung berlaku untuk tiket baru. Tiket yang sudah ada tidak di-route ulang.</p>
         </div>
-        <div className="text-sm text-slate-600 sm:text-right">
-          <button type="button" onClick={this.sample} className="mb-1 mr-3 inline-flex min-h-[36px] items-center gap-1.5 rounded-lg px-3 text-xs font-semibold text-[var(--brand)] hover:bg-emerald-50"><DatabaseZap className="h-4 w-4" aria-hidden="true" />Add sample data (60-day history)</button>
-          <span className="inline-flex items-center gap-1"><RotateCcw className="h-4 w-4" aria-hidden="true" /><ConfirmButton label="Reset to default" onConfirm={this.reset} /></span>
-          <p className="text-xs text-slate-500">Department, team, rule, catalog, dan user. Lokasi dan kategori tidak berubah.</p>
-        </div>
+        <p className="max-w-xs text-xs text-slate-500 sm:text-right">Tersimpan di server. Kategori, subkategori, pengguna, dan team yang "dihapus" dinonaktifkan agar riwayat tiket tetap utuh.</p>
       </header>
       <nav aria-label="Bagian admin" className="flex gap-2 overflow-x-auto border-b border-slate-200 pb-px">
         {TABS.map(([k, label]) => (

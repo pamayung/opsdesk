@@ -1,15 +1,52 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { formatDateTime, formatDuration } from '../../../domain/constants';
 
 // Menyelesaikan tiket: cukup catatan "apa yang sudah dilakukan". Eskalasi ke pihak luar bersifat opsional.
 export default class ClosurePanel extends React.Component {
-  state = { note: '', error: '', askVendor: false, vendor: '' };
-  close = () => { const error = this.props.onClose({ note: this.state.note }); this.setState({ error: error || '' }); };
-  escalate = () => {
-    const error = this.props.onEscalate({ to: this.state.vendor });
+  state = { note: '', error: '', askVendor: false, vendor: '', askReopen: false, reason: '', busy: false };
+  close = async () => { const error = await this.props.onClose({ note: this.state.note }); this.setState({ error: error || '' }); };
+  escalate = async () => {
+    const error = await this.props.onEscalate({ to: this.state.vendor });
     this.setState(error ? { error } : { error: '', askVendor: false, vendor: '' });
   };
+
+  reopen = async () => {
+    this.setState({ busy: true, error: '' });
+    const error = await this.props.onReopen({ reason: this.state.reason });
+    if (this.mounted) this.setState(error ? { error, busy: false } : { busy: false, askReopen: false, reason: '' });
+  };
+  componentDidMount() { this.mounted = true; }
+  componentWillUnmount() { this.mounted = false; }
+
+  // Reopen: hanya ditawarkan bila server mengizinkan (pelapor atau manajer department, maks. 7 hari sejak Resolved).
+  renderReopen() {
+    const { ticket: t, now, canReopen, reopenExpired } = this.props;
+    const { askReopen, reason, error, busy } = this.state;
+    if (reopenExpired) return <p className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600" data-testid="reopen-expired">Sudah lewat 7 hari sejak resolved, jadi tiket ini tidak bisa dibuka kembali. Buat tiket baru bila masalahnya muncul lagi.</p>;
+    if (!canReopen) return null;
+    return (
+      <div className="mt-4 border-t border-slate-100 pt-4">
+        {!askReopen ? (
+          <div>
+            <button type="button" onClick={() => this.setState({ askReopen: true })} className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-800 hover:bg-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand)]"><RotateCcw className="h-4 w-4" aria-hidden="true" />Reopen ticket</button>
+            <p className="mt-2 text-xs text-slate-500">Masalahnya muncul lagi? Bisa dibuka kembali sampai {formatDateTime(t.reopenUntil, now)}.</p>
+          </div>
+        ) : (
+          <div className="rounded-xl bg-slate-50 p-3">
+            <label htmlFor="reopen-reason" className="block text-sm font-semibold text-slate-800">Kenapa tiket ini dibuka kembali?</label>
+            <textarea id="reopen-reason" rows={3} value={reason} maxLength={500} onChange={(e) => this.setState({ reason: e.target.value, error: '' })} placeholder="Contoh: POS mati lagi sore ini, sama seperti sebelumnya." className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white p-3 text-sm outline-none focus:ring-2 focus:ring-[var(--brand)]" />
+            <p className="mt-1.5 text-xs text-slate-500">SLA dihitung ulang dari nol. PIC terakhir mendapat email dan tiket kembali ke antreannya.</p>
+            {error && <p role="alert" className="mt-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+            <div className="mt-3 flex gap-2">
+              <button type="button" onClick={this.reopen} disabled={busy || reason.trim().length < 5} className="min-h-[44px] rounded-xl bg-[var(--brand)] px-4 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">{busy ? 'Memproses…' : 'Reopen ticket'}</button>
+              <button type="button" onClick={() => this.setState({ askReopen: false, reason: '', error: '' })} className="min-h-[44px] rounded-xl bg-white px-4 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50">Batal</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   renderDone() {
     const { ticket: t, now } = this.props;
@@ -23,6 +60,7 @@ export default class ClosurePanel extends React.Component {
           <div className="flex justify-between gap-4"><dt className="text-slate-500">Total duration</dt><dd className="text-right font-medium text-slate-900">{formatDuration((r.closedAt - t.createdAt) / 60000)}</dd></div>
         </dl>
         {t.escalation && <p className="mt-3 text-xs text-slate-500">Sempat di-escalate ke {t.escalation.to}.</p>}
+        {this.renderReopen()}
       </>
     );
   }
@@ -65,6 +103,7 @@ export default class ClosurePanel extends React.Component {
   render() {
     // Hanya PIC / manajer yang bisa menyelesaikan atau mengeskalasi; pihak lain hanya melihat hasil akhirnya.
     if (this.props.readOnly && this.props.ticket.status !== 'done') return null;
+    // tiket Resolved ditutup untuk semua kecuali Reopen (hasil penyelesaian tetap tampil)
     return (
       <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6" aria-labelledby="closure-title">
         {this.props.ticket.status === 'done' ? this.renderDone() : this.renderForm()}

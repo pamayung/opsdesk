@@ -2,11 +2,11 @@ import React from 'react';
 import { Download, Printer, RotateCcw, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { AppContext } from '../../app/AppContext';
 import { PRIORITIES, REQUEST_TYPES, formatDuration, formatCompact } from '../../domain/constants';
-import { periodOf, exportRows, toCsv, DAY } from '../../domain/Report';
+import { DAY } from '../../data/mappers';
 import { pathText } from '../../domain/Location';
 import { Card, PriorityBadge } from '../components/ui';
 import { TrendChart, BarList, dayLabel } from '../components/charts';
-import { downloadText } from '../utils/download';
+import { downloadBlob } from '../utils/download';
 
 const PRESETS = [['today', 'Today'], ['7', '7 days'], ['30', '30 days'], ['90', '90 days'], ['custom', 'Custom']];
 const DEFAULTS = { preset: '30', from: '', to: '', department: 'all', locationId: 'all', categoryId: 'all', priority: 'all', type: 'all' };
@@ -15,13 +15,17 @@ const sel = 'min-h-[42px] w-full rounded-xl border border-slate-200 bg-white px-
 const fmtFull = new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
 const ymd = (ts) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jakarta' }).format(ts);
 const dur = (m) => (m === null ? '-' : formatCompact(m));
-// Perbandingan dengan periode sebelumnya hanya bermakna bila datanya cukup.
-const MIN_PREV = 5;
+// Rentang tanggal kustom (YYYY-MM-DD, inklusif) yang nyata dan tidak terbalik. Server memvalidasi ulang.
+const validRange = (from, to) => {
+  const ok = (v) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(v || '')) return null; const [y, m, d] = v.split('-').map(Number); const dt = new Date(Date.UTC(y, m - 1, d)); return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d ? dt.getTime() : null; };
+  const f = ok(from); const t = ok(to);
+  return f !== null && t !== null && t >= f;
+};
 
 // Selisih terhadap periode sebelumnya. good: null = netral, true = membaik, false = memburuk.
 const delta = (cur, prev, { lowerBetter = false, points = false, neutral = false } = {}) => {
   if (cur === null || prev === null) return null;
-  if (points) { const d = Math.round((cur - prev) * 10) / 10; return { text: `${d > 0 ? '+' : ''}${d} poin`, good: d === 0 ? null : d > 0 }; }
+  if (points) { const d = Math.round((cur - prev) * 10) / 10; return { text: `${d > 0 ? '+' : ''}${d} poin`, good: d === 0 ? null : lowerBetter ? d < 0 : d > 0 }; }
   if (prev === 0) return { text: cur === 0 ? 'same' : 'new', good: null };
   const p = Math.round(((cur - prev) / prev) * 100);
   return { text: `${p > 0 ? '+' : ''}${p}%`, good: neutral || p === 0 ? null : lowerBetter ? p < 0 : p > 0 };
@@ -29,17 +33,29 @@ const delta = (cur, prev, { lowerBetter = false, points = false, neutral = false
 
 export default class ReportsPage extends React.Component {
   static contextType = AppContext;
-  state = { ...DEFAULTS };
+  state = { ...DEFAULTS, report: null, loading: true, error: '' };
+  componentDidMount() { this.mounted = true; this.last = this.filterKey(); this.load(); }
+  componentDidUpdate() { const k = this.filterKey(); if (k !== this.last) { this.last = k; clearTimeout(this.debounce); this.debounce = setTimeout(this.load, 250); } }
+  componentWillUnmount() { this.mounted = false; clearTimeout(this.debounce); }
   set = (k) => (e) => this.setState({ [k]: e.target.value });
-
-  period(now) {
-    const s = this.state;
-    return periodOf(s.preset, now, { from: s.from, to: s.to });
-  }
-  exportCsv = (report, now) => {
-    const { container } = this.context;
-    const rows = exportRows(report.tickets, { now, names: container.reportNames });
-    downloadText(`report-opsdesk-${ymd(report.period.from)}-sd-${ymd(report.period.to - DAY)}.csv`, toCsv(rows));
+  filterKey() { const s = this.state; return JSON.stringify([s.preset, s.from, s.to, s.department, s.locationId, s.categoryId, s.priority, s.type]); }
+  filters() { const { preset, from, to, department, locationId, categoryId, priority, type } = this.state; return { preset, from, to, department, locationId, categoryId, priority, type }; }
+  invalid() { const s = this.state; return s.preset === 'custom' && !validRange(s.from, s.to); }
+  // Laporan dihitung server (hanya tiket yang boleh dilihat pengguna). Tanggal kustom divalidasi dulu agar tidak memanggil API sia-sia.
+  load = async () => {
+    if (this.invalid()) { this.setState({ report: null, loading: false, error: '' }); return; }
+    const req = (this.req = (this.req || 0) + 1);
+    this.setState({ loading: true });
+    try {
+      const report = await this.context.container.reports.overview(this.filters());
+      if (this.mounted && req === this.req) this.setState({ report, loading: false, error: '' });
+    } catch (err) { if (this.mounted && req === this.req) this.setState({ report: null, loading: false, error: err.message }); }
+  };
+  exportCsv = async (report) => {
+    try {
+      const blob = await this.context.container.reports.exportCsv(this.filters());
+      downloadBlob(`report-opsdesk-${ymd(report.period.from)}-sd-${ymd(report.period.to - DAY)}.csv`, blob);
+    } catch (err) { this.context.notify(err.message); }
   };
 
   kpiCard(label, value, hint, d, key) {
@@ -60,18 +76,18 @@ export default class ReportsPage extends React.Component {
       <Card className="break-inside-avoid !p-0">
         <h2 className="px-5 pt-4 font-semibold text-slate-950">{title}</h2>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full min-w-[560px] text-left text-sm">
+          <table className="w-full min-w-[620px] text-left text-sm">
             <thead className="border-y border-slate-100 bg-slate-50 text-xs text-slate-600"><tr>
-              <th className="px-5 py-2 font-semibold">{firstCol}</th><th className="px-3 py-2 text-right font-semibold">Created</th><th className="px-3 py-2 text-right font-semibold">Resolved</th><th className="px-3 py-2 text-right font-semibold">Breached</th><th className="px-3 py-2 text-right font-semibold">Compliance</th><th className="px-3 py-2 text-right font-semibold">Response</th><th className="px-5 py-2 text-right font-semibold">Resolution</th></tr></thead>
+              <th className="px-5 py-2 font-semibold">{firstCol}</th><th className="px-3 py-2 text-right font-semibold">Created</th><th className="px-3 py-2 text-right font-semibold">Resolved</th><th className="px-3 py-2 text-right font-semibold">Breached</th><th className="px-3 py-2 text-right font-semibold">Reopened</th><th className="px-3 py-2 text-right font-semibold">Compliance</th><th className="px-3 py-2 text-right font-semibold">Response</th><th className="px-5 py-2 text-right font-semibold">Resolution</th></tr></thead>
             <tbody>
               {rows.map((r) => (
                 <tr key={r.key || '-'} className="border-b border-slate-100 last:border-0">
                   <td className="px-5 py-2.5 font-medium text-slate-900">{r.label}</td><td className="px-3 py-2.5 text-right tabular-nums">{r.total}</td><td className="px-3 py-2.5 text-right tabular-nums">{r.resolved}</td>
-                  <td className={`px-3 py-2.5 text-right tabular-nums ${r.breached ? 'font-semibold text-red-600' : ''}`}>{r.breached}</td>
+                  <td className={`px-3 py-2.5 text-right tabular-nums ${r.breached ? 'font-semibold text-red-600' : ''}`}>{r.breached}</td><td className={`px-3 py-2.5 text-right tabular-nums ${r.reopened ? 'font-semibold text-violet-700' : ''}`}>{r.reopened}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums">{r.slaRate === null ? '-' : `${r.slaRate}%`}</td><td className="px-3 py-2.5 text-right tabular-nums">{dur(r.avgResponseMin)}</td><td className="px-5 py-2.5 text-right tabular-nums">{dur(r.avgResolutionMin)}</td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-500">Tidak ada data.</td></tr>}
+              {!rows.length && <tr><td colSpan={8} className="px-5 py-8 text-center text-slate-500">Tidak ada data.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -81,17 +97,17 @@ export default class ReportsPage extends React.Component {
 
   render() {
     const { container, user, goTo } = this.context;
-    const now = Date.now();
     const s = this.state;
     const nodes = container.listLocations.execute();
     const cats = container.listCategories.execute();
-    const p = this.period(now);
-    const report = p ? container.getReport.execute(user, { ...p, department: s.department, locationId: s.locationId, categoryId: s.categoryId, priority: s.priority, type: s.type }, now) : null;
+    const { report, loading, error } = s;
+    const p = report ? report.period : null;
+    const invalid = this.invalid();
     const canDept = user.role === 'management' || user.role === 'admin';
     const filtered = ['department', 'locationId', 'categoryId', 'priority', 'type'].some((k) => s[k] !== 'all');
     const k = report && report.kpi;
     const pv = report && report.prev;
-    const hasPrev = !!report && pv.total >= MIN_PREV;
+    const hasPrev = !!report && report.comparisonAvailable;
     const D = (d) => (hasPrev ? d : null);
     const periodText = p ? `${fmtFull.format(p.from)} – ${fmtFull.format(p.to - DAY)}` : '';
     const chip = (a) => `min-h-[40px] rounded-full px-4 text-sm font-semibold ${a ? 'bg-[var(--brand)] text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50'}`;
@@ -103,7 +119,7 @@ export default class ReportsPage extends React.Component {
           <p className="mt-1 text-sm text-slate-600">{SCOPE[user.role]}.{periodText && <> Periode <span className="font-medium text-slate-800">{periodText}</span>.</>}</p>
         </div>
         <div className="flex gap-2 print:hidden">
-          <button type="button" disabled={!report || !report.tickets.length} onClick={() => this.exportCsv(report, now)} className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-[var(--brand)] px-4 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"><Download className="h-4 w-4" aria-hidden="true" />Download CSV</button>
+          <button type="button" disabled={!report || !report.kpi.total} onClick={() => this.exportCsv(report)} className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-[var(--brand)] px-4 text-sm font-semibold text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"><Download className="h-4 w-4" aria-hidden="true" />Download CSV</button>
           <button type="button" onClick={() => window.print()} className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-800 hover:bg-slate-200"><Printer className="h-4 w-4" aria-hidden="true" />Print / PDF</button>
         </div>
       </header>
@@ -129,23 +145,26 @@ export default class ReportsPage extends React.Component {
       </Card>
       {filtered && <p className="hidden text-sm text-slate-600 print:block">Filter aktif diterapkan pada report ini.</p>}
 
-      {!report && <Card className="py-10 text-center"><p className="font-semibold text-slate-900">Tanggal belum valid</p><p className="mt-1 text-sm text-slate-500">Isi tanggal mulai dan akhir. Tanggal akhir tidak boleh sebelum tanggal mulai.</p></Card>}
+      {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
+      {loading && !report && !invalid && <Card className="py-10 text-center text-sm text-slate-500" role="status">Memuat laporan…</Card>}
+      {invalid && <Card className="py-10 text-center"><p className="font-semibold text-slate-900">Tanggal belum valid</p><p className="mt-1 text-sm text-slate-500">Isi tanggal mulai dan akhir. Tanggal akhir tidak boleh sebelum tanggal mulai.</p></Card>}
 
       {report && k.total === 0 && (
         <Card className="py-10 text-center"><p className="font-semibold text-slate-900">Tidak ada tiket pada periode dan filter ini</p>
-          <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">Coba periode yang lebih panjang atau kurangi filter. Untuk demo, sample history 60 days bisa dimuat dari halaman Admin.</p></Card>
+          <p className="mx-auto mt-1 max-w-md text-sm text-slate-500">Coba periode yang lebih panjang atau kurangi filter.</p></Card>
       )}
 
       {report && k.total > 0 && <>
-        <section className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6" aria-label="Summary">
+        <section className="grid grid-cols-2 gap-3 lg:grid-cols-4" aria-label="Summary">
           {this.kpiCard('Tickets created', k.total, `${report.period.days} days`, D(delta(k.total, pv.total, { neutral: true })), 'a')}
           {this.kpiCard('Resolved', k.resolved, `${Math.round((k.resolved / k.total) * 100)}% of created tickets`, D(delta(k.resolved, pv.resolved)), 'b')}
           {this.kpiCard('Still open', k.open, `${report.openNow} open now (all periods)`, null, 'c')}
           {this.kpiCard('SLA compliance', k.slaRate === null ? '-' : `${k.slaRate}%`, `${k.breached} breached tickets`, D(delta(k.slaRate, pv.slaRate, { points: true })), 'd')}
           {this.kpiCard('Average response', dur(k.avgResponseMin), 'until taken by PIC', D(delta(k.avgResponseMin, pv.avgResponseMin, { lowerBetter: true })), 'e')}
           {this.kpiCard('Average resolution', dur(k.avgResolutionMin), `dari ${k.resolved} resolved tickets`, D(delta(k.avgResolutionMin, pv.avgResolutionMin, { lowerBetter: true })), 'f')}
+          {this.kpiCard('Reopened', k.reopenRate === null ? '-' : `${k.reopenRate}%`, `${k.reopened} tiket dibuka kembali setelah resolved`, D(delta(k.reopenRate, pv.reopenRate, { points: true, lowerBetter: true })), 'g')}
         </section>
-        {!hasPrev && <p className="-mt-2 text-xs text-slate-500">Perbandingan dengan periode sebelumnya disembunyikan karena periode itu hanya punya {pv.total} tiket (minimal {MIN_PREV}).</p>}
+        {!hasPrev && <p className="-mt-2 text-xs text-slate-500">Perbandingan dengan periode sebelumnya disembunyikan karena periode itu hanya punya {pv.total} tiket (minimal 5).</p>}
 
         <Card className="break-inside-avoid">
           <h2 className="font-semibold text-slate-950">Ticket trend</h2>

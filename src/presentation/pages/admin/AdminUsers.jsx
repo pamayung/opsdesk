@@ -2,18 +2,18 @@ import React from 'react';
 import { Plus, Check } from 'lucide-react';
 import { AdminTab, Field, ConfirmButton, ErrorNote, inputCls, btnPrimary, btnSecondary, btnSmall } from '../../components/admin/kit';
 
-const blank = { name: '', title: '', role: 'employee', department: '', teamIds: [], location: '' };
+const blank = { name: '', email: '', password: '', title: '', role: 'employee', department: '', teamIds: [], location: '' };
 
 export default class AdminUsers extends AdminTab {
   // form: null | { id?, name, title, role, department, teamIds, location }
   state = { error: '', form: null };
   set = (k) => (e) => this.setState({ form: { ...this.state.form, [k]: e.target.value }, error: '' });
   toggleTeam = (id) => { const f = this.state.form; this.setState({ form: { ...f, teamIds: f.teamIds.includes(id) ? f.teamIds.filter((x) => x !== id) : [...f.teamIds, id] }, error: '' }); };
-  edit = (u) => this.setState({ error: '', form: { id: u.id, name: u.name, title: u.title || '', role: u.role, department: u.department || '', teamIds: u.teamIds || [], location: u.location || '' } });
-  save = (e) => {
+  edit = (u) => this.setState({ error: '', form: { id: u.id, name: u.name, email: u.email || '', password: '', title: u.title || '', role: u.role, department: u.department || '', teamIds: u.teamIds || [], location: u.location || '' } });
+  save = async (e) => {
     e.preventDefault();
     const f = this.state.form;
-    const ok = this.act(() => (f.id ? this.admin.updateUser(f.id, f) : this.admin.addUser(f)), f.id ? 'User diperbarui.' : 'User ditambahkan.');
+    const ok = await this.act(() => (f.id ? this.admin.updateUser(f.id, f) : this.admin.addUser(f)), f.id ? 'User diperbarui.' : 'User ditambahkan.');
     if (ok) this.setState({ form: null });
   };
   scopeText(u) {
@@ -39,12 +39,12 @@ export default class AdminUsers extends AdminTab {
               <li key={u.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3" data-user={u.id}>
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-100 text-sm font-bold text-slate-700" aria-hidden="true">{u.name[0]}</span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">{u.name}<span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800">{container.roles[u.role].label}</span>{u.id === me.id && <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500"><Check className="h-3 w-3" aria-hidden="true" />Anda</span>}</span>
-                  <span className="block truncate text-xs text-slate-500">{[u.title, this.scopeText(u)].filter(Boolean).join(' · ')}</span>
+                  <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">{u.name}<span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-800">{container.roles[u.role].label}</span>{u.id === me.id && <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500"><Check className="h-3 w-3" aria-hidden="true" />Anda</span>}{u.inactive && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">Inactive</span>}</span>
+                  <span className="block truncate text-xs text-slate-500">{[u.email, u.title, this.scopeText(u)].filter(Boolean).join(' · ')}</span>
                 </span>
                 <span className="flex items-center gap-1">
                   <button type="button" onClick={() => this.edit(u)} className={`${btnSmall} text-slate-700 hover:bg-slate-100`} aria-label={`Ubah ${u.name}`}>Ubah</button>
-                  <ConfirmButton disabled={u.id === me.id} onConfirm={() => this.act(() => this.admin.removeUser(u.id, me.id), `${u.name} dihapus.`)} />
+                  {!u.inactive && <ConfirmButton label="Nonaktifkan" disabled={u.id === me.id} onConfirm={() => this.act(() => this.admin.removeUser(u.id), `${u.name} dinonaktifkan.`)} />}
                 </span>
               </li>
             ))}
@@ -57,6 +57,8 @@ export default class AdminUsers extends AdminTab {
           {form && (
             <form onSubmit={this.save} className="mt-4 space-y-4">
               <Field label="Nama" htmlFor="u-name" hint={form.id ? 'Nama tidak bisa diubah agar riwayat tiket tetap terkait.' : undefined}><input id="u-name" className={`${inputCls} mt-1`} value={form.name} onChange={this.set('name')} disabled={!!form.id} /></Field>
+              <Field label="Email" htmlFor="u-email" hint="Dipakai untuk login dan notifikasi."><input id="u-email" type="email" className={`${inputCls} mt-1`} value={form.email} onChange={this.set('email')} placeholder="nama@perusahaan.com" /></Field>
+              <Field label={form.id ? 'Kata sandi baru (optional)' : 'Kata sandi awal'} htmlFor="u-pass" hint={form.id ? 'Kosongkan bila tidak diubah. Semua sesi user ini akan keluar bila diisi.' : 'Minimal 8 karakter. Tanpa kata sandi, user belum bisa login.'}><input id="u-pass" type="password" autoComplete="new-password" className={`${inputCls} mt-1`} value={form.password} onChange={this.set('password')} /></Field>
               <Field label="Jabatan" htmlFor="u-title"><input id="u-title" className={`${inputCls} mt-1`} value={form.title} onChange={this.set('title')} placeholder="Contoh: IT Support Area" /></Field>
               <Field label="Role" htmlFor="u-role"><select id="u-role" className={`${inputCls} mt-1`} value={form.role} onChange={this.set('role')}>{Object.entries(container.roles).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}</select></Field>
               {form.role === 'manager' && <Field label="Department yang dikelola" htmlFor="u-dept"><select id="u-dept" className={`${inputCls} mt-1`} value={form.department} onChange={this.set('department')}><option value="">Pilih department…</option>{Object.entries(container.departments).map(([k, d]) => <option key={k} value={k}>{d.name}</option>)}</select></Field>}

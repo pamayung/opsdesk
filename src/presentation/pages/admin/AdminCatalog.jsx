@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
-import { QUESTION_TYPES } from '../../../domain/Admin';
+import { QUESTION_TYPES } from '../../../domain/Rules';
 import { AdminTab, Field, ConfirmButton, ErrorNote, inputCls, btnPrimary, btnSecondary, btnSmall } from '../../components/admin/kit';
 
 let uidSeq = 0;
@@ -13,10 +13,10 @@ class QuestionEditor extends AdminTab {
   add = () => this.setState((s) => ({ rows: [...s.rows, toRow({ label: '', type: 'text' })], dirty: true }));
   remove = (uid) => this.setState((s) => ({ rows: s.rows.filter((r) => r.uid !== uid), dirty: true }));
   move = (i, d) => this.setState((s) => { const rows = [...s.rows]; const j = i + d; if (j < 0 || j >= rows.length) return null; [rows[i], rows[j]] = [rows[j], rows[i]]; return { rows, dirty: true }; });
-  save = () => {
+  save = async () => {
     const { catId, sub } = this.props;
     const input = this.state.rows.map((r) => ({ id: r.id, label: r.label, type: r.type, options: r.optionsText.split(','), required: r.required, placeholder: r.placeholder }));
-    if (this.act(() => this.admin.saveQuestions(catId, sub.id, input), 'Pertanyaan disimpan.')) this.setState((s) => ({ rows: this.context.container.catalog.subOf(catId, sub.id).questions.map(toRow), dirty: false }));
+    if (await this.act(() => this.admin.saveQuestions(catId, sub.id, input), 'Pertanyaan disimpan.')) this.setState({ rows: this.context.container.catalog.subOf(catId, sub.id).questions.map(toRow), dirty: false });
   };
   render() {
     const { rows, dirty, error } = this.state;
@@ -73,8 +73,8 @@ export default class AdminCatalog extends AdminTab {
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[250px_270px_minmax(0,1fr)]">
         <section className="rounded-2xl border border-slate-200 bg-white p-3" aria-label="Kategori">
           <h2 className="px-3 pb-2 pt-1 text-sm font-semibold text-slate-950">Kategori</h2>
-          <ul>{cats.map((c) => <li key={c.id}><button type="button" onClick={() => this.pickCat(c.id)} className={item(catId === c.id)}><span className="min-w-0 truncate">{c.name}</span><span className="text-xs font-normal text-slate-500">{usage[c.id] || 0} tiket</span></button></li>)}</ul>
-          <form onSubmit={(e) => { e.preventDefault(); if (this.act(() => this.admin.addCategory(newCat), 'Kategori ditambahkan.')) this.setState({ newCat: '' }); }} className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+          <ul>{cats.map((c) => <li key={c.id}><button type="button" onClick={() => this.pickCat(c.id)} className={item(catId === c.id)}><span className="min-w-0 truncate">{c.name}</span></button></li>)}</ul>
+          <form onSubmit={async (e) => { e.preventDefault(); if (await this.act(() => this.admin.addCategory(newCat), 'Kategori ditambahkan.')) this.setState({ newCat: '' }); }} className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
             <label className="sr-only" htmlFor="new-cat">Kategori baru</label>
             <input id="new-cat" className={`${inputCls} !min-h-[40px]`} value={newCat} onChange={(e) => this.setState({ newCat: e.target.value, error: '' })} placeholder="Kategori baru" />
             <button type="submit" className={`${btnSmall} shrink-0 bg-[var(--brand)] !min-h-[40px] text-white`} aria-label="Tambah kategori"><Plus className="h-4 w-4" aria-hidden="true" /></button>
@@ -83,7 +83,7 @@ export default class AdminCatalog extends AdminTab {
             <div className="mt-3 border-t border-slate-100 pt-3">
               <label className="text-xs font-medium text-slate-600" htmlFor="ren-cat">Ubah nama "{cat.name}"</label>
               <div className="mt-1 flex gap-2"><input id="ren-cat" className={`${inputCls} !min-h-[40px]`} value={renameCat || cat.name} onChange={(e) => this.setState({ renameCat: e.target.value, error: '' })} /><button type="button" onClick={() => this.act(() => this.admin.updateCategory(cat.id, renameCat || cat.name), 'Kategori diperbarui.') && this.setState({ renameCat: '' })} className={`${btnSmall} shrink-0 bg-slate-100 !min-h-[40px]`}>Simpan</button></div>
-              <div className="mt-2"><ConfirmButton onConfirm={() => this.act(() => this.admin.removeCategory(cat.id), 'Kategori dihapus.') && this.pickCat('')} label="Hapus kategori" /></div>
+              <div className="mt-2"><ConfirmButton onConfirm={async () => { if (await this.act(() => this.admin.removeCategory(cat.id), 'Kategori dinonaktifkan.')) this.pickCat(''); }} label="Hapus kategori" /></div>
             </div>
           )}
         </section>
@@ -94,7 +94,7 @@ export default class AdminCatalog extends AdminTab {
           {cat && <>
             <ul>{subs.map((s) => <li key={s.id}><button type="button" onClick={() => this.pickSub(s.id)} className={item(subId === s.id)}><span className="min-w-0 truncate">{s.name}</span><span className="text-xs font-normal text-slate-500">{s.questions.length} pertanyaan</span></button></li>)}
               {!subs.length && <li className="px-3 py-2 text-sm text-slate-500">Belum ada subkategori. Tiket kategori ini langsung di-route tanpa subkategori.</li>}</ul>
-            <form onSubmit={(e) => { e.preventDefault(); if (this.act(() => this.admin.addSub(cat.id, newSub), 'Subkategori ditambahkan.')) this.setState({ newSub: '' }); }} className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
+            <form onSubmit={async (e) => { e.preventDefault(); if (await this.act(() => this.admin.addSub(cat.id, newSub), 'Subkategori ditambahkan.')) this.setState({ newSub: '' }); }} className="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               <label className="sr-only" htmlFor="new-sub">Subkategori baru</label>
               <input id="new-sub" className={`${inputCls} !min-h-[40px]`} value={newSub} onChange={(e) => this.setState({ newSub: e.target.value, error: '' })} placeholder="Subkategori baru" />
               <button type="submit" className={`${btnSmall} shrink-0 bg-[var(--brand)] !min-h-[40px] text-white`} aria-label="Tambah subkategori"><Plus className="h-4 w-4" aria-hidden="true" /></button>
@@ -103,7 +103,7 @@ export default class AdminCatalog extends AdminTab {
               <div className="mt-3 border-t border-slate-100 pt-3">
                 <label className="text-xs font-medium text-slate-600" htmlFor="ren-sub">Ubah nama "{sub.name}"</label>
                 <div className="mt-1 flex gap-2"><input id="ren-sub" className={`${inputCls} !min-h-[40px]`} value={renameSub || sub.name} onChange={(e) => this.setState({ renameSub: e.target.value, error: '' })} /><button type="button" onClick={() => this.act(() => this.admin.renameSub(cat.id, sub.id, renameSub || sub.name), 'Subkategori diperbarui.') && this.setState({ renameSub: '' })} className={`${btnSmall} shrink-0 bg-slate-100 !min-h-[40px]`}>Simpan</button></div>
-                <div className="mt-2"><ConfirmButton onConfirm={() => this.act(() => this.admin.removeSub(cat.id, sub.id), 'Subkategori dihapus.') && this.pickSub('')} label="Hapus subkategori" /></div>
+                <div className="mt-2"><ConfirmButton onConfirm={async () => { if (await this.act(() => this.admin.removeSub(cat.id, sub.id), 'Subkategori dinonaktifkan.')) this.pickSub(''); }} label="Hapus subkategori" /></div>
               </div>
             )}
           </>}

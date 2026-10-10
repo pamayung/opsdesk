@@ -13,10 +13,10 @@ export default class AdminLocations extends AdminTab {
   add = (parentId) => this.setState({ error: '', form: { name: '', parentId: parentId || '', kind: 'outlet' } });
   edit = (n) => this.setState({ error: '', form: { id: n.id, name: n.name, parentId: n.parentId || '', kind: n.kind || 'outlet' } });
   set = (k) => (e) => this.setState({ form: { ...this.state.form, [k]: e.target.value }, error: '' });
-  save = (e) => {
+  save = async (e) => {
     e.preventDefault();
     const f = this.state.form;
-    const ok = this.act(() => (f.id ? this.admin.updateLocation(f.id, f) : this.admin.addLocation(f)), f.id ? 'Lokasi diperbarui.' : 'Lokasi ditambahkan.');
+    const ok = await this.act(() => (f.id ? this.admin.updateLocation(f.id, f) : this.admin.addLocation(f)), f.id ? 'Lokasi diperbarui.' : 'Lokasi ditambahkan.');
     if (ok) this.setState({ form: null });
   };
 
@@ -54,7 +54,7 @@ export default class AdminLocations extends AdminTab {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 lg:sticky lg:top-24" aria-labelledby="loc-form">
           <h2 id="loc-form" className="font-semibold text-slate-950">{form ? (form.id ? 'Ubah lokasi' : 'Tambah lokasi') : 'Editor lokasi'}</h2>
-          {!form && <p className="mt-2 text-sm text-slate-500">Pilih <span className="font-medium">Ubah</span> pada sebuah lokasi, atau tambahkan lokasi baru. Mengganti nama lokasi ikut memperbarui semua tiketnya.</p>}
+          {!form && <p className="mt-2 text-sm text-slate-500">Pilih <span className="font-medium">Ubah</span> pada sebuah lokasi, atau tambahkan lokasi baru. Mengganti nama lokasi ikut memperbarui semua tiketnya; lokasi yang masih dipakai tiket tidak bisa dihapus.</p>}
           {form && (
             <form onSubmit={this.save} className="mt-4 space-y-4">
               <Field label="Nama lokasi" htmlFor="loc-name"><input id="loc-name" className={`${inputCls} mt-1`} value={form.name} onChange={this.set('name')} placeholder="Contoh: Outlet Tebet" autoFocus /></Field>
@@ -65,8 +65,8 @@ export default class AdminLocations extends AdminTab {
                 </select>
               </Field>
               {!form.parentId && (
-                <Field label="Jenis lokasi" htmlFor="loc-kind" hint="Diwarisi seluruh turunan dan dipakai routing rules.">
-                  <select id="loc-kind" className={`${inputCls} mt-1`} value={form.kind} onChange={this.set('kind')}>
+                <Field label="Jenis lokasi" htmlFor="loc-kind" hint={form.id ? 'Jenis lokasi utama tidak bisa diubah setelah dibuat.' : 'Diwarisi seluruh turunan dan dipakai routing rules.'}>
+                  <select id="loc-kind" className={`${inputCls} mt-1`} value={form.kind} onChange={this.set('kind')} disabled={!!form.id}>
                     {Object.entries(LOCATION_KINDS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                   </select>
                 </Field>

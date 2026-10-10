@@ -1,0 +1,191 @@
+{
+ "period": {
+  "preset": "7d",
+  "from": "2026-10-04T00:00:00+07:00",
+  "to": "2026-10-11T00:00:00+07:00",
+  "step": "day"
+ },
+ "kpis": {
+  "total": 4,
+  "resolved": 1,
+  "open": 3,
+  "breached": 0,
+  "sla_rate": 100,
+  "avg_response_min": 0,
+  "avg_resolution_min": 0,
+  "reopened": 1,
+  "reopen_rate": 50
+ },
+ "previous": {
+  "total": 0,
+  "resolved": 0,
+  "open": 0,
+  "breached": 0,
+  "sla_rate": null,
+  "avg_response_min": null,
+  "avg_resolution_min": null,
+  "reopened": 0,
+  "reopen_rate": null
+ },
+ "comparison_available": false,
+ "trend": [
+  {
+   "start": "2026-10-03T17:00:00Z",
+   "end": "2026-10-04T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-04T17:00:00Z",
+   "end": "2026-10-05T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-05T17:00:00Z",
+   "end": "2026-10-06T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-06T17:00:00Z",
+   "end": "2026-10-07T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-07T17:00:00Z",
+   "end": "2026-10-08T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-08T17:00:00Z",
+   "end": "2026-10-09T17:00:00Z",
+   "created": 0,
+   "resolved": 0
+  },
+  {
+   "start": "2026-10-09T17:00:00Z",
+   "end": "2026-10-10T17:00:00Z",
+   "created": 4,
+   "resolved": 1
+  }
+ ],
+ "by_team": [
+  {
+   "key_id": 1,
+   "label": "IT Support Area",
+   "total": 4,
+   "resolved": 1,
+   "breached": 0,
+   "sla_rate": 100,
+   "avg_response_min": 0,
+   "avg_resolution_min": 0,
+   "reopened": 1
+  }
+ ],
+ "by_pic": [
+  {
+   "key_id": 1,
+   "label": "Kevin Mahendra",
+   "total": 2,
+   "resolved": 1,
+   "breached": 0,
+   "sla_rate": 100,
+   "avg_response_min": 0,
+   "avg_resolution_min": 0,
+   "reopened": 1
+  },
+  {
+   "key_id": null,
+   "label": "(belum diambil)",
+   "total": 1,
+   "resolved": 0,
+   "breached": 0,
+   "sla_rate": 100,
+   "avg_response_min": null,
+   "avg_resolution_min": null,
+   "reopened": 0
+  },
+  {
+   "key_id": 2,
+   "label": "Budi Santoso",
+   "total": 1,
+   "resolved": 0,
+   "breached": 0,
+   "sla_rate": 100,
+   "avg_response_min": 0,
+   "avg_resolution_min": null,
+   "reopened": 0
+  }
+ ],
+ "breakdown": {
+  "category": [
+   {
+    "label": "Komputer & Jaringan",
+    "count": 4
+   }
+  ],
+  "department": [
+   {
+    "label": "IT",
+    "count": 4
+   }
+  ],
+  "location": [
+   {
+    "label": "Senopati",
+    "count": 4
+   }
+  ],
+  "priority": [
+   {
+    "label": "P3",
+    "count": 2
+   },
+   {
+    "label": "P1",
+    "count": 1
+   },
+   {
+    "label": "P2",
+    "count": 1
+   }
+  ],
+  "type": [
+   {
+    "label": "incident",
+    "count": 4
+   }
+  ]
+ },
+ "aging": [
+  {
+   "band": "lt_1h",
+   "count": 3,
+   "at_risk": 1
+  },
+  {
+   "band": "1_4h",
+   "count": 0,
+   "at_risk": 0
+  },
+  {
+   "band": "4_24h",
+   "count": 0,
+   "at_risk": 0
+  },
+  {
+   "band": "1_3d",
+   "count": 0,
+   "at_risk": 0
+  },
+  {
+   "band": "gt_3d",
+   "count": 0,
+   "at_risk": 0
+  }
+ ],
+ "late": []
+}

@@ -1,0 +1,13 @@
+{
+ "id": 43,
+ "name": "Rina",
+ "email": "rina@opsdesk.example",
+ "title": "Kasir",
+ "role": "employee",
+ "department_id": null,
+ "default_location_id": 4,
+ "is_external": false,
+ "is_active": true,
+ "created_at": "0001-01-01T00:00:00Z",
+ "teams": []
+}
