@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import assert from 'node:assert/strict';
-import { buildRef, toUser, toTicketSummary, toTicketDetail, toStats, toDeptQueues, toTeamQueues, toReport, toRoutePreview, buildAdmin, hoursFromRows, rowsFromHours, slaTexts } from '../src/data/mappers.js';
+import { buildRef, toUser, toTicketSummary, toTicketDetail, toStats, toDeptQueues, toTeamQueues, toReport, toRoutePreview, buildAdmin, hoursFromRows, rowsFromHours, slaTexts, toCategoriesInUse } from '../src/data/mappers.js';
 import { eventText } from '../src/data/eventText.js';
 const DAY = 86400000;
 
@@ -16,6 +16,15 @@ test('referensi: lokasi aktif, kind hanya di akar, ID string', () => {
   const root = ref.locations.find((l) => l.name === 'Operations'); const leaf = ref.locations.find((l) => l.name === 'Senopati');
   assert.equal(typeof root.id, 'string'); assert.equal(root.parentId, null); assert.equal(root.kind, 'outlet');
   assert.ok(leaf.parentId && leaf.kind === undefined);
+});
+test('kategori di filter daftar: hanya yang ada pada tiket pengguna, urut katalog, tanpa kategori kosong', () => {
+  const inUse = toCategoriesInUse(fx('dashboard-kevin'), ref);
+  assert.deepEqual(inUse.map((c) => c.id), ['it']);
+  assert.ok(ref.categories.length > inUse.length, 'katalog lengkap lebih panjang daripada daftar pengguna');
+  assert.deepEqual(toCategoriesInUse({ by_category: [] }, ref), []);
+  assert.deepEqual(toCategoriesInUse({}, ref), []); // server lama tanpa by_category tidak membuat error
+  const two = toCategoriesInUse({ by_category: [{ id: ref.catNum.fasilitas }, { id: ref.catNum.it }, { id: 999999 }] }, ref);
+  assert.deepEqual(two.map((c) => c.id), ref.categories.map((c) => c.id).filter((id) => id === 'it' || id === 'fasilitas'), 'urutan katalog; ID tak dikenal diabaikan');
 });
 test('referensi: katalog memakai slug dan pertanyaan berID string', () => {
   const pos = ref.catalog.it.find((s) => s.id === 'pos');

@@ -59,8 +59,11 @@ export default class TicketListPage extends React.Component {
     const { container, query, setQuery, dept, setDept, user } = this.context;
     const role = user.role;
     const { category, status, assignment, attention, now, items, meta, loading, loadingMore, error } = this.state;
-    const categories = container.listCategories.execute();
+    const categories = container.listCategories.execute(); // katalog lengkap: untuk nama kategori pada kartu
     const nameOf = (id) => (categories.find((c) => c.id === id) || {}).name;
+    // Chip filter hanya untuk kategori yang ada pada tiket pengguna ini (pendek); kategori terpilih tetap tampil agar bisa dilepas.
+    const inUse = container.listCategoriesInUse.execute();
+    const chips = categories.filter((c) => c.id === category || inUse.some((u) => u.id === c.id));
     const s = container.stats;
     const chip = (a) => `rounded-full px-3 py-2 text-xs font-semibold whitespace-nowrap ${a ? 'bg-[var(--brand)] text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200'}`;
     return <div className="space-y-5">
@@ -91,10 +94,10 @@ export default class TicketListPage extends React.Component {
           <button type="button" aria-pressed={dept === 'all'} className={chip(dept === 'all')} onClick={() => setDept('all')}>Semua department</button>
           {Object.entries(container.departments).map(([id, d]) => <button key={id} type="button" aria-pressed={dept === id} className={chip(dept === id)} onClick={() => setDept(id)}>{d.name}</button>)}
         </div>}
-        <div className="mt-3 flex gap-2 overflow-x-auto border-t border-slate-100 pt-3">
+        {(chips.length > 1 || category !== 'all') && <div className="mt-3 flex gap-2 overflow-x-auto border-t border-slate-100 pt-3" data-testid="category-chips">
           <button type="button" aria-pressed={category === 'all'} className={chip(category === 'all')} onClick={() => this.setState({ category: 'all' })}>Semua kategori</button>
-          {categories.map((c) => <button key={c.id} type="button" aria-pressed={category === c.id} className={chip(category === c.id)} onClick={() => this.setState({ category: c.id })}>{c.name}</button>)}
-        </div>
+          {chips.map((c) => <button key={c.id} type="button" aria-pressed={category === c.id} className={chip(category === c.id)} onClick={() => this.setState({ category: c.id })}>{c.name}</button>)}
+        </div>}
       </Card>
       {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
       <p className="text-xs text-slate-500" data-testid="list-count">{loading ? 'Memuat tiket…' : `${items.length} dari ${meta ? meta.total : 0} tiket ditampilkan · diperbarui otomatis tiap 15 detik`}</p>

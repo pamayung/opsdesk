@@ -111,6 +111,11 @@ export function toStats(s, kpis) {
     slaRate: s.total ? Math.round(((s.total - s.breached) / s.total) * 1000) / 10 : 100,
   };
 }
+// Kategori yang ada pada tiket yang terlihat oleh pengguna (dari server, mengikuti hak lihat), urut sama dengan katalog. Untuk filter daftar.
+export const toCategoriesInUse = (s, ref) => {
+  const present = new Set((s.by_category || []).map((c) => ref.catSlug[c.id]).filter(Boolean));
+  return ref.categories.filter((c) => present.has(c.id));
+};
 export const toDeptQueues = (s, ref) => s.by_department.map((d) => ({ id: ref.deptSlug[d.id] || String(d.id), name: d.name, count: d.total, risk: d.at_risk, waiting: d.open, total: d.total }));
 export const toTeamQueues = (s) => s.by_team.map((t) => ({ id: String(t.id), name: t.name, count: t.total, risk: t.at_risk, waiting: t.open }));
 

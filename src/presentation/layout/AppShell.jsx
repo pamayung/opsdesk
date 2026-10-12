@@ -1,6 +1,7 @@
 import React from 'react';
-import { LayoutDashboard, Inbox, PlusCircle, Search, Bell, Plus, ChevronDown, Settings, BarChart3, LogOut, KeyRound } from 'lucide-react';
+import { LayoutDashboard, Inbox, PlusCircle, Search, Bell, Plus, ChevronDown, Settings, BarChart3, LogOut, KeyRound, Volume2, VolumeX } from 'lucide-react';
 import { AppContext } from '../../app/AppContext';
+import { isSoundOn, setSoundOn, playAlert } from '../../app/sound';
 
 // Nama menu antrean menyesuaikan peran: karyawan melihat tiketnya, PIC antreannya, dst.
 const QUEUE_LABEL = { employee: 'My Tickets', pic: 'My Queue', manager: 'Department Queue', management: 'All Tickets', admin: 'All Tickets' };
@@ -14,7 +15,8 @@ const navFor = (role) => [
 
 export default class AppShell extends React.Component {
   static contextType = AppContext;
-  state = { menu: false };
+  state = { menu: false, sound: isSoundOn() };
+  toggleSound = () => { const on = !this.state.sound; setSoundOn(on); this.setState({ sound: on }); if (on) playAlert('new'); }; // bunyi contoh saat diaktifkan
   render() {
     const { page, goTo, toast, container, user, query, setQuery, logout } = this.context;
     const NAV = navFor(user.role);
@@ -34,6 +36,9 @@ export default class AppShell extends React.Component {
         </div>
         <div className="ml-auto flex items-center gap-2 md:ml-0">
           <button type="button" onClick={() => goTo('report')} className="hidden h-10 items-center gap-1.5 rounded-xl bg-[var(--brand)] px-3.5 text-sm font-semibold text-white hover:brightness-110 sm:inline-flex"><Plus className="h-4 w-4" aria-hidden="true" />Report Issue</button>
+          <button type="button" onClick={this.toggleSound} aria-pressed={this.state.sound} aria-label={this.state.sound ? 'Matikan suara notifikasi' : 'Nyalakan suara notifikasi'} title={this.state.sound ? 'Suara notifikasi: aktif' : 'Suara notifikasi: mati'} data-testid="sound-toggle" className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
+            {this.state.sound ? <Volume2 className="h-[18px] w-[18px]" aria-hidden="true" /> : <VolumeX className="h-[18px] w-[18px]" aria-hidden="true" />}
+          </button>
           <button type="button" onClick={() => goTo('tickets')} aria-label={badge ? `${badge} ticket${badge === 1 ? '' : 's'} at SLA risk, open queue` : 'Open ticket queue'} className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50">
             <Bell className="h-[18px] w-[18px]" aria-hidden="true" />
             {badge > 0 && <span className="absolute -right-1 -top-1 grid h-5 min-w-[20px] place-items-center rounded-full bg-red-600 px-1 text-[11px] font-bold text-white">{badge}</span>}

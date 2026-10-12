@@ -33,6 +33,8 @@ export default class ApiStore {
   }
 
   // ---- pembacaan sinkron (bentuk sama dengan konfigurasi prototype) ----
+  // Hanya kategori yang punya tiket di daftar pengguna ini; katalog lengkap tetap di `categories` (form lapor).
+  get categoriesInUse() { return this.summary ? M.toCategoriesInUse(this.summary, this.ref) : []; }
   get departments() { return this.cfg ? this.cfg.departments : this.ref.departments; }
   get teams() { return this.cfg ? this.cfg.teams : {}; }
   get rules() { return this.cfg ? this.cfg.rules : []; }

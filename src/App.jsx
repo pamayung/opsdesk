@@ -12,6 +12,8 @@ import ReportsPage from './presentation/pages/ReportsPage';
 import LoginPage from './presentation/pages/LoginPage';
 import ResetPasswordPage from './presentation/pages/ResetPasswordPage';
 import AccountPage from './presentation/pages/AccountPage';
+import { detectAlert } from './domain/Alerts';
+import { armSound, playAlert } from './app/sound';
 
 // Routing berbasis hash: #/  #/tiket  #/tiket/TCK-1042  #/buat  #/laporan  #/admin/lokasi  #/akun  #/reset-password?token=...
 const parseHash = () => {
@@ -35,7 +37,8 @@ export default class App extends React.Component {
   componentDidMount() {
     window.addEventListener('hashchange', this.onHash);
     window.addEventListener(SESSION_EXPIRED, this.onExpired);
-    this.poll = setInterval(() => { if (this.state.phase === 'ready' && !document.hidden) this.refresh(); }, REFRESH_MS);
+    armSound();
+    this.poll = setInterval(() => { if (this.state.phase === 'ready' && !document.hidden) this.refresh({ alert: true }); }, REFRESH_MS);
     this.init();
   }
   componentWillUnmount() {
@@ -46,7 +49,7 @@ export default class App extends React.Component {
   // Sesi lama (token di localStorage) dipulihkan saat halaman dibuka.
   init = async () => {
     if (!client.session) { this.setState({ phase: 'anon' }); return; }
-    try { await container.store.bootstrap(); this.setState({ phase: 'ready' }); }
+    try { await container.store.bootstrap(); this.lastStats = { ...container.store.stats }; this.setState({ phase: 'ready' }); }
     catch (e) {
       if (isApiError(e) && e.status === 401) { container.store.clear(); this.setState({ phase: 'anon' }); } else this.setState({ phase: 'error', authMsg: e.message });
     }
@@ -54,21 +57,29 @@ export default class App extends React.Component {
   login = async (email, password) => {
     await client.login(email, password);
     await container.store.bootstrap();
+    this.lastStats = { ...container.store.stats };
     this.setState({ phase: 'ready', dept: 'all', query: '', authMsg: '' });
     if (this.state.page === 'reset') window.location.hash = '#/'; else this.goTo('dashboard');
   };
   logout = async (msg = '') => {
     await client.logout();
-    container.store.clear();
+    container.store.clear(); this.lastStats = null;
     this.setState({ phase: 'anon', authMsg: msg, dept: 'all', query: '' });
     window.location.hash = '#/';
   };
-  onExpired = () => { container.store.clear(); this.setState({ phase: 'anon', authMsg: 'Sesi Anda berakhir. Silakan login kembali.' }); };
+  onExpired = () => { container.store.clear(); this.lastStats = null; this.setState({ phase: 'anon', authMsg: 'Sesi Anda berakhir. Silakan login kembali.' }); };
   goTo = (page, id) => { const h = toHash(page, id); if (window.location.hash === h) return; window.location.hash = h; };
   // Data berubah -> muat ulang ringkasan (badge, statistik) lalu render ulang seluruh aplikasi.
-  refresh = () => {
+  // Hanya polling berkala ({ alert: true }) yang membunyikan notifikasi; refresh akibat aksi pengguna sendiri hanya memperbarui baseline.
+  refresh = (opt) => {
     this.setState((s) => ({ rev: s.rev + 1 }));
-    return container.store.loadSummary().catch(() => {}).then(() => this.setState((s) => ({ rev: s.rev + 1 })));
+    const alert = !!(opt && opt.alert);
+    return container.store.loadSummary().catch(() => {}).then(() => {
+      const next = container.store.stats; const hit = alert ? detectAlert(this.lastStats, next) : null;
+      this.lastStats = next ? { ...next } : this.lastStats;
+      if (hit) { playAlert(hit.kind); this.notify(hit.message); }
+      this.setState((s) => ({ rev: s.rev + 1 }));
+    });
   };
   setDept = (dept) => this.setState({ dept });
   setQuery = (query) => { this.setState({ query }); if (this.state.page !== 'tickets') this.goTo('tickets'); };

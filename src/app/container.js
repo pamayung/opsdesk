@@ -37,6 +37,7 @@ export const container = {
   get slaTexts() { return (p) => M.slaTexts(store.ref, p); },
   catalog: { subsOf: (c) => store.subsOf(c), subOf: (c, s) => store.subOf(c, s) },
   listCategories: { execute: () => store.categories },
+  listCategoriesInUse: { execute: () => store.categoriesInUse },
   listLocations: { execute: () => store.locations },
   locationPath: (n) => store.locationPath(n),
   locationKind: (n) => store.locationKind(n),
